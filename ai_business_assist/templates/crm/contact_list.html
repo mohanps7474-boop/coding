@@ -14,32 +14,30 @@
     </div>
 
     <div class="glass-card">
-        <table style="width: 100%; border-collapse: collapse;">
+        <table>
             <thead>
-                <tr
-                    style="text-align: left; color: var(--text-dim); font-size: 0.85rem; border-bottom: 1px solid var(--glass-border);">
-                    <th style="padding: 1rem;">NAME</th>
-                    <th style="padding: 1rem;">EMAIL</th>
-                    <th style="padding: 1rem;">PHONE</th>
-                    <th style="padding: 1rem;">TAGS</th>
-                    <th style="padding: 1rem;">ADDED</th>
+                <tr>
+                    <th>NAME</th>
+                    <th>EMAIL</th>
+                    <th>PHONE</th>
+                    <th>TAGS</th>
+                    <th>ADDED</th>
                 </tr>
             </thead>
             <tbody>
                 {% for contact in contacts %}
-                <tr style="border-bottom: 1px solid var(--glass-border);">
-                    <td style="padding: 1rem;">{{ contact }}</td>
-                    <td style="padding: 1rem; color: var(--text-dim);">{{ contact.email }}</td>
-                    <td style="padding: 1rem; color: var(--text-dim);">{{ contact.phone_number }}</td>
-                    <td style="padding: 1rem;">
+                <tr>
+                    <td>{{ contact }}</td>
+                    <td style="color: var(--text-dim);">{{ contact.email }}</td>
+                    <td style="color: var(--text-dim);">{{ contact.phone_number }}</td>
+                    <td>
                         {% for tag in contact.tags.all %}
-                        <span
-                            style="background: rgba(99, 102, 241, 0.1); color: var(--primary-light); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin-right: 0.25rem;">
+                        <span class="badge">
                             {{ tag.name }}
                         </span>
                         {% endfor %}
                     </td>
-                    <td style="padding: 1rem; color: var(--text-dim);">{{ contact.created_at|date:"M d, Y" }}</td>
+                    <td style="color: var(--text-dim);">{{ contact.created_at|date:"M d, Y" }}</td>
                 </tr>
                 {% empty %}
                 <tr>

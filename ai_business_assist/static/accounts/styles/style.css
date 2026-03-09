@@ -1,37 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap');
-
-:root {
-    --primary: #6366f1;
-    --primary-light: #818cf8;
-    --secondary: #ec4899;
-    --bg-dark: #0f172a;
-    --bg-card: rgba(255, 255, 255, 0.05);
-    --text-main: #f8fafc;
-    --text-dim: #94a3b8;
-    --accent: #10b981;
-    --glass-border: rgba(255, 255, 255, 0.1);
-}
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 * {
     padding: 0;
     margin: 0;
-    box-sizing: border-box;
 }
 
 body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--bg-dark);
-    color: var(--text-main);
-    background-image:
-        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.15) 0px, transparent 50%);
+    font-family: "Montserrat", sans-serif;
+    background: linear-gradient(150deg, rgba(200, 179, 250, 0.607), white);
     background-repeat: no-repeat;
     min-height: 100vh;
-}
-
-h1,
-.form_container h1 {
-    font-family: 'Outfit', sans-serif;
 }
 
 main {
@@ -41,17 +19,13 @@ main {
 .navigation_logo {
     height: 80px;
     width: 80px;
-    object-fit: contain;
-    border-radius: 12px;
 }
 
 nav {
     display: flex;
     justify-content: space-between;
-    padding: 1rem 30px;
-    background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--glass-border);
+    padding: 0 30px;
+    background-color: white;
 }
 
 .nav_links {
@@ -62,73 +36,64 @@ nav {
 
 .nav_links a {
     text-decoration: none;
-    color: var(--text-dim);
-    font-weight: 500;
-    transition: all 0.3s ease;
+    color: black;
+    font-weight: bold;
 }
 
 .nav_links a:hover {
-    color: var(--text-main);
+    color: indigo;
+    scale: 1.1;
 }
 
 #nav_signin_btn {
-    padding: 10px 20px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    padding: 10px 10px;
+    background-color: #3713ec;
     border-radius: 10px;
     color: white;
-    font-weight: 600;
+
 }
 
 .form_container {
     min-width: 400px;
-    max-width: 500px;
-    background: var(--bg-card);
-    backdrop-filter: blur(12px);
-    margin: 60px auto;
-    border-radius: 24px;
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    max-width: 600px;
+    background-color: white;
+    margin: 50px auto;
+    border-radius: 10px;
+    border: 1px solid rgba(128, 128, 128, 0.466);
+    box-shadow: 10px 5px 30px rgba(0, 0, 0, 0.08);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 40px;
+
 }
 
 .form_container h1 {
     font-size: 24px;
-    margin-top: 20px;
-    color: var(--text-main);
 }
 
 .form_container .navigation_logo {
-    height: 80px;
-    width: 80px;
+    height: 150px;
+    width: 150px;
 }
 
 .form_container form {
-    width: 100%;
+    /* max-width: 600px; */
     display: flex;
     flex-direction: column;
-    gap: 1.25rem;
-    padding: 40px;
+    gap: 20px;
+    padding: 30px 60px;
 }
 
 .form_container a {
-    color: var(--primary-light);
-    padding-top: 10px;
+    color: black;
+    padding-top: 20px;
     text-align: center;
-    text-decoration: none;
-    font-size: 0.9rem;
-}
-
-.form_container a:hover {
-    text-decoration: underline;
 }
 
 .input_feilds {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 5px;
 }
 
 .two_cols {
@@ -139,79 +104,53 @@ nav {
 }
 
 .two_cols div {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .input_feilds label {
-    font-weight: 500;
-    font-size: 0.85rem;
-    color: var(--text-dim);
+    font-weight: bold;
+    font-size: 12px;
 }
 
 .input_feilds input {
-    padding: 0.75rem 1rem;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    color: var(--text-main);
-    font-family: inherit;
-    transition: all 0.3s ease;
-}
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
 
-.input_feilds input:focus {
-    outline: none;
-    border-color: var(--primary);
-    background: rgba(255, 255, 255, 0.05);
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
 .input_feilds button {
-    background: linear-gradient(135deg, var(--primary), var(--primary-light));
-    color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 12px;
-    border: none;
-    font-family: 'Outfit', sans-serif;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 10px;
+    background: linear-gradient(to bottom, rgb(172, 172, 240), white);
+    color: black;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    font-family: "Montserrat", sans-serif;
+    font-weight: bold;
 }
 
 .input_feilds button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    background: linear-gradient(to top, rgb(172, 172, 240), white);
 }
 
 .message {
-    padding: 0.75rem 1rem;
-    border-radius: 12px;
-    font-size: 0.9rem;
-    width: 100%;
-    margin-bottom: 10px;
+    border: 1px solid rgba(128, 128, 128, 0.571);
+    padding: 10px 20px;
+    border-radius: 10px;
 }
 
 .error {
-    background-color: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    background-color: rgba(252, 183, 183, 0.674);
 }
 
 .success {
-    background-color: rgba(16, 185, 129, 0.1);
-    color: var(--accent);
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    background-color: rgba(0, 128, 0, 0.26);
 }
 
 footer {
-    background: rgba(15, 23, 42, 0.8);
-    backdrop-filter: blur(10px);
-    border-top: 1px solid var(--glass-border);
+    background-color: white;
     padding: 20px;
     text-align: center;
-    color: var(--text-dim);
-    font-size: 0.9rem;
 }
