@@ -1,0 +1,60 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+{% block title %}
+Register Page
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form_container">
+    <img src="{% static 'img/logo.jpg' %}" alt="" class="navigation_logo">
+    <h1>Create Your BizBot Account</h1>
+    <form action="{% url 'register' %}" method="POST">
+        {% csrf_token %}
+        {% if error %}
+        <p class="message error">{{ error }}</p>
+        {% endif %}
+        {% if success %}
+        <p class="message success">{{ success }}</p>
+        {% endif %}
+        <div class="input_feilds two_cols">
+            <div>
+                <label for="f_name">First Name</label>
+                <input type="text" name="f_name" id="f_name" placeholder="eg. Jhon">
+            </div>
+
+            <div>
+                <label for="l_name">Last Name</label>
+                <input type="text" name="l_name" id="l_name">
+            </div>
+
+        </div>
+        <div class="input_feilds">
+            <label for="shop_name">Shop Name</label>
+            <input type="text" name="shop_name" id="shop_name">
+        </div>
+
+
+        <div class="input_feilds">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email">
+        </div>
+        <div class="input_feilds">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password">
+        </div>
+
+        <div class="input_feilds">
+            <label for="password">Renter your Password</label>
+            <input type="password" name="conf_password" id="conf_password">
+        </div>
+
+        <div class="input_feilds">
+            <button type="submit">Register</button>
+            <a href="{% url 'login_page' %}">Already have an account? Sign in</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

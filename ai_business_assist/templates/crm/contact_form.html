@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Contact | BizBot{% endblock %}
+
+{% block page_title %}New Contact{% endblock %}
+
+{% block content %}
+<div class="fade-in" style="max-width: 600px; margin: 0 auto;">
+    <div class="glass-card">
+        <h2 style="margin-bottom: 1.5rem;">Contact Details</h2>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div style="color: var(--secondary); font-size: 0.8rem; margin-top: 0.25rem;">
+                    {{ field.errors|striptags }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">
+                    <i class="fas fa-save"></i> Save Contact
+                </button>
+                <a href="{% url 'contact_list' %}" class="btn"
+                    style="background: var(--bg-dark); border: 1px solid var(--glass-border); color: var(--text-dim);">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

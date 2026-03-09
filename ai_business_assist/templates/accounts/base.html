@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}{% endblock %} - BizBot
+    </title>
+    <link rel="stylesheet" href="{% static 'accounts/styles/style.css' %}">
+</head>
+
+<body>
+    <nav>
+        <header>
+            <img class="navigation_logo" src="{% static 'img/logo.jpg' %}" alt="BizBot Logo">
+        </header>
+
+        <div class="nav_links">
+            <a href="">Features</a>
+            <a href="">Pricing</a>
+            <a href="">About</a>
+            <a href="" id="nav_signin_btn">Sign In</a>
+        </div>
+
+    </nav>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>Copyright &copy; 2026 BizBot. All rights reserved.</p>
+    </footer>
+</body>
+
+</html>

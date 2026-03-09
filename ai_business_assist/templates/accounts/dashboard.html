@@ -1,0 +1,12 @@
+{% extends 'accounts/base.html' %}
+{% block title %} Dashboard {% endblock %}
+
+{% block content %}
+<div class="form_container">
+    <h1>Welcome to BizBot Dashboard</h1>
+    <p>You are logged in as {{ user.username }}</p>
+    <div class="input_feilds">
+        <a href="{% url 'handle_logout' %}" style="display: block; margin-top: 20px;">Logout</a>
+    </div>
+</div>
+{% endblock %}

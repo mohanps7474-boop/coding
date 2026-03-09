@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Campaigns | BizBot{% endblock %}
+
+{% block page_title %}Marketing Campaigns{% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <p style="color: var(--text-dim);">Track and manage your automated marketing efforts.</p>
+        <a href="{% url 'campaign_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> Create Campaign
+        </a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+        {% for campaign in campaigns %}
+        <div class="glass-card" style="position: relative; overflow: hidden;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
+                <div>
+                    <span
+                        style="font-size: 0.75rem; color: var(--primary-light); font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
+                        {{ campaign.get_channel_display }}
+                    </span>
+                    <h3 style="margin-top: 0.25rem; font-size: 1.25rem;">{{ campaign.name }}</h3>
+                </div>
+                <span
+                    style="padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.75rem; background: var(--bg-dark); 
+                    color: {% if campaign.status == 'COMPLETED' %}var(--accent){% elif campaign.status == 'RUNNING' %}var(--primary-light){% else %}var(--text-dim){% endif %};">
+                    {{ campaign.get_status_display }}
+                </span>
+            </div>
+
+            <p style="color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.5rem;">
+                {{ campaign.content|truncatechars:100 }}
+            </p>
+
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; padding-top: 1.25rem; border-top: 1px solid var(--glass-border);">
+                <div style="font-size: 0.85rem; color: var(--text-dim);">
+                    <i class="far fa-calendar-alt"></i> {{ campaign.created_at|date:"M d, Y" }}
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn"
+                        style="padding: 0.4rem; background: transparent; border: 1px solid var(--glass-border); color: var(--text-dim);">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn"
+                        style="padding: 0.4rem; background: transparent; border: 1px solid var(--glass-border); color: var(--text-dim);">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="glass-card" style="grid-column: 1 / -1; text-align: center; padding: 4rem;">
+            <i class="fas fa-paper-plane fa-3x" style="margin-bottom: 1rem; opacity: 0.3;"></i>
+            <h3>No campaigns found</h3>
+            <p style="color: var(--text-dim); margin-bottom: 1.5rem;">Launch your first marketing campaign to see
+                results.</p>
+            <a href="{% url 'campaign_create' %}" class="btn btn-primary">Create Campaign</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

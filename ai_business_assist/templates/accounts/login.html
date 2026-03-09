@@ -1,0 +1,36 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+{% block title %}
+Login Page
+{% endblock %}
+{% block content %}
+
+<div class="form_container">
+    <img src="{% static 'img/logo.jpg' %}" alt="" class="navigation_logo">
+    <h1>Login to Your BizBot Account</h1>
+    <form action="{% url 'handle_login' %}" method="POST">
+        {% csrf_token %}
+        {% if error %}
+        <p class="message error">{{ error }}</p>
+        {% endif %}
+        {% if success %}
+        <p class="message success">{{ success }}</p>
+        {% endif %}
+
+        <div class="input_feilds">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email">
+        </div>
+        <div class="input_feilds">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password">
+        </div>
+
+        <div class="input_feilds">
+            <button type="submit">Login</button>
+            <a href="{% url 'register_page' %}">Don't have an account? Sign up</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

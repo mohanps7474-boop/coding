@@ -1,0 +1,289 @@
+step by step login and registration page
+1 registration page
+this is Code
+{% extends 'accounts/base.html' %}
+{% load static %}
+{% block title %}
+    Register Page
+{% endblock %}
+
+
+{% block content %}
+
+<div class="form_container">
+    <img src="{% static 'accounts/images/logo.png' %}" alt="" class="navigation_logo">
+    <h1>Create Your Quizio Account</h1>
+    <form action="{% url 'register' %}" method="POST">
+        {% csrf_token %}
+        {% if error %}
+            <p class="message error">{{ error }}</p>
+        {% endif %}
+            {% if success %}
+            <p class="message success">{{ success }}</p>
+        {% endif %}
+        <div class="input_feilds two_cols">
+            <div>
+                <label for="f_name">First Name</label>
+                <input type="text" name="f_name" id="f_name" placeholder="eg. Jhon">
+            </div>
+            
+            <div>
+                <label for="l_name">Last Name</label>
+                <input type="text" name="l_name" id="l_name">
+            </div>
+        
+        </div>
+
+        
+
+        <div class="input_feilds">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email">
+        </div>
+        <div class="input_feilds">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password">
+        </div>
+
+        <div class="input_feilds">
+            <label for="password">Renter your Password</label>
+            <input type="password" name="conf_password" id="conf_password">
+        </div>
+
+        <div class="input_feilds">
+            <button type="submit">Register</button>
+            <a href="{% url 'login_page' %}">Already have an account? Sign in</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+2 login page
+this is Code
+{% extends 'accounts/base.html' %}
+{% load static %}
+{% block title %}
+    Login Page
+{% endblock %}
+{% block content %}
+
+<div class="form_container">
+    <img src="{% static 'accounts/images/logo.png' %}" alt="" class="navigation_logo">
+    <h1>Login to Your Quizio Account</h1>
+    <form action="{% url 'handle_login' %}" method="POST">
+        {% csrf_token %}
+        {% if error %}
+            <p class="message error">{{ error }}</p>
+        {% endif %}
+            {% if success %}
+            <p class="message success">{{ success }}</p>
+        {% endif %}
+
+        <div class="input_feilds">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email">
+        </div>
+        <div class="input_feilds">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password">
+        </div>
+
+        <div class="input_feilds">
+            <button type="submit">Login</button>
+            <a href="{% url 'register_page' %}">Don't have an account? Sign up</a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+3 base page 
+this is Code
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+    {% block title %}{% endblock %}  - Quizio
+    </title>
+    <link rel="stylesheet" href="{% static 'accounts/styles/style.css' %}">
+</head>
+<body>
+    <nav>
+        <header>
+            <img class="navigation_logo" src="{% static 'accounts/images/logo.png' %}" alt="Quizio Logo">
+        </header>
+
+        <div class="nav_links">
+            <a href="">Features</a>
+            <a href="">Pricing</a>
+            <a href="">About</a>
+            <a href="" id="nav_signin_btn">Sign In</a>
+        </div>
+        
+    </nav>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>Copyright &copy; 2026 Quizio. All rights reserved.</p>
+    </footer>
+</body>
+</html>
+
+4 css style page 
+this is Code for all above mentioned base,register,login page 
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+*{
+    padding: 0;
+    margin: 0;
+}
+
+body{
+     font-family: "Montserrat", sans-serif;
+     background: linear-gradient(150deg, rgba(200, 179, 250, 0.607),white);
+     background-repeat: no-repeat;
+     min-height: 100vh;
+}
+
+main {
+   min-height: 70vh;
+}
+
+.navigation_logo{
+    height: 80px;
+    width: 80px;
+}
+
+nav{
+    display: flex;
+    justify-content: space-between;
+    padding: 0 30px;
+    background-color: white;
+}
+
+.nav_links{
+    display: flex;
+    gap: 30px;
+    align-items: center;
+}
+
+.nav_links a{
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+}
+
+.nav_links a:hover{
+    color: indigo;
+    scale: 1.1;
+}
+
+#nav_signin_btn{
+    padding: 10px 10px;
+    background-color: #3713ec;
+    border-radius: 10px;
+    color: white;
+
+}
+
+.form_container{
+    min-width: 400px;
+    max-width: 600px;
+    background-color: white;
+    margin: 50px auto;
+    border-radius: 10px;
+    border: 1px solid rgba(128, 128, 128, 0.466);
+    box-shadow: 10px 5px 30px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+.form_container h1{
+    font-size: 24px;
+}
+.form_container .navigation_logo{
+    height: 150px;
+    width: 150px;
+}
+.form_container form{
+    /* max-width: 600px; */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 30px 60px;
+}
+.form_container a{
+    color: black;
+    padding-top: 20px;
+    text-align: center;
+}
+
+.input_feilds{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.two_cols{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 20px;
+}
+.two_cols div{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.input_feilds label{
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.input_feilds input{
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+
+}
+.input_feilds button{
+    background:linear-gradient(to bottom,rgb(172, 172, 240),white);
+    color: black;
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    font-family: "Montserrat", sans-serif;
+    font-weight: bold;
+}
+
+.input_feilds button:hover{
+    background:linear-gradient(to top,rgb(172, 172, 240),white);
+}
+
+.message{
+    border: 1px solid rgba(128, 128, 128, 0.571);
+    padding: 10px 20px;
+    border-radius: 10px;
+}
+.error {
+    background-color: rgba(252, 183, 183, 0.674);
+}
+
+.success{
+    background-color: rgba(0, 128, 0, 0.26);
+}
+footer{
+    background-color: white;
+    padding: 20px;
+    text-align: center;
+}
+/* .input_feilds input[type="text"]{
+} */
