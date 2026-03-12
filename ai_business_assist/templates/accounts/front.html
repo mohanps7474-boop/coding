@@ -1,0 +1,73 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %} Welcome to BizBot {% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <!-- User Greeting -->
+    <div style="padding: 20px 0 10px 0; text-align: left; width: 100%; max-width: 600px; margin: 0 auto;">
+        <p style="color: #3713ec; font-weight: bold; font-size: 0.9rem;">
+            Hi, <span style="color: #1a1a1a;">{{ user.username|default:"Business Owner" }}</span>
+        </p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="form_container" style="margin-top: 10px;">
+        <div style="padding-top: 40px; text-align: center;">
+            <h1 style="color: #1a1a1a; font-weight: 800; margin-bottom: 5px;">Welcome to BizBot!</h1>
+            <p style="color: #3713ec; font-weight: 600; font-size: 0.95rem;">Your No-code AI Business Assistant</p>
+        </div>
+
+        <div style="padding: 30px 40px 50px 40px; width: 100%; box-sizing: border-box;">
+            <!-- Success Message -->
+            <div class="message success" style="margin-bottom: 25px; border-left: 4px solid #3713ec;">
+                <p style="font-size: 0.9rem; color: #444; font-weight: 500; line-height: 1.5;">
+                    Thank you for joining <span style="font-weight: bold; color: #3713ec;">BizBot</span>. Your journey
+                    to
+                    smarter business management starts here.
+                </p>
+            </div>
+
+            <!-- Intro Text -->
+            <div style="margin-bottom: 30px;">
+                <p style="font-size: 0.9rem; color: #666; line-height: 1.6; margin-bottom: 15px;">
+                    Running a business is challenging — <span
+                        style="color: #1a1a1a; font-weight: bold; font-style: italic;">but getting customers shouldn't
+                        be.</span>
+                </p>
+                <p style="font-size: 0.9rem; color: #666; line-height: 1.6;">
+                    BizBot helps market your shop automatically so you can focus on what you love.
+                </p>
+            </div>
+
+            <!-- Action Button -->
+            <div class="input_feilds">
+                <a href="{% url 'dashboard' %}" style="text-decoration: none;">
+                    <button type="button" style="width: 100%; cursor: pointer;">
+                        Go to Dashboard
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fade-in {
+        animation: fadeIn 0.8s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+{% endblock %}

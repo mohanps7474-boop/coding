@@ -14,7 +14,7 @@ def handle_login(request):
         login_result = authenticate(username = email, password = password)
         if login_result:
             django_login(request,user=login_result)
-            return redirect("dashboard")
+            return redirect("form_page")
         else:
             return render(request,"accounts/login.html",{"error":"Invalid email or password"})
         
@@ -48,6 +48,17 @@ def register(request):
 def dashboard_view(request):
     # Note: named dashboard_view to avoid conflict if 'dashboard' is an app name
     return render(request,"accounts/dashboard.html")
+
+@login_required
+def front_page(request):
+    return render(request,"accounts/front.html")
+
+@login_required
+def form_page(request):
+    if request.method == "POST":
+        # Process form data here if needed
+        return redirect("front_page")
+    return render(request, "accounts/form.html")
 
 def handle_logout(request):
     logout(request)
