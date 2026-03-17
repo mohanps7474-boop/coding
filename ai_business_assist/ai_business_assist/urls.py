@@ -17,9 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from accounts.views import portfolio_view
+
 urlpatterns = [
     path('admin/', admin.site.urls), # Admin
-    path('', include('dashboard.urls')),
+    path('', portfolio_view, name='home'),
+    path('dashboard/', include('dashboard.urls')),
     path('crm/', include('crm.urls')),
     path('campaigns/', include('campaigns.urls')),
     path('accounts/', include('accounts.urls')),

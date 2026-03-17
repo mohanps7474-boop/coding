@@ -1,0 +1,262 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>BizBot - AI Business Assistant</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3b82f6", // Blue
+                        "accent": "#ec4899",  // Pink
+                        "background-light": "#ffffff",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .glass {
+            background: rgba(59, 130, 246, 0.03);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .neon-border {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
+        }
+
+        .glow-button {
+            box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39);
+        }
+
+        .accent-glow {
+            box-shadow: 0 4px 14px 0 rgba(236, 72, 153, 0.3);
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light text-slate-900 font-display">
+    <!-- Header -->
+    <header
+        class="sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-white/90 backdrop-blur-md border-b border-slate-100">
+        <div class="flex items-center gap-2">
+            <img src="{% static 'img/logo.jpg' %}" alt="BizBot Logo" class="w-8 h-8 rounded-lg object-cover">
+            <span class="font-bold text-xl tracking-tight text-slate-900">BizBot</span>
+        </div>
+        <nav class="hidden md:flex items-center gap-8">
+            <a class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors" href="#">Features</a>
+            <a class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors" href="#">How It
+                Works</a>
+            <a class="text-sm font-semibold text-slate-600 hover:text-primary transition-colors"
+                href="{% url 'handle_login' %}">Sign In</a>
+            <a href="{% url 'register_page' %}"
+                class="bg-primary text-white px-5 py-2 rounded-lg font-bold text-sm hover:opacity-90 transition-opacity">Get
+                Started</a>
+        </nav>
+        <div class="flex items-center gap-4 md:hidden">
+            <a class="text-sm font-bold text-primary" href="{% url 'handle_login' %}">Login</a>
+            <a href="{% url 'register_page' %}" class="bg-primary text-white px-4 py-2 rounded-lg font-bold text-sm">Get
+                Started</a>
+        </div>
+    </header>
+    <main class="overflow-x-hidden">
+        <!-- Hero Section -->
+        <section class="relative min-h-[85vh] flex flex-col items-center justify-center px-6 pt-12 pb-20 text-center">
+            <div
+                class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.05),transparent_70%)]">
+            </div>
+            <div class="absolute top-20 left-10 w-64 h-64 bg-primary/5 rounded-full blur-[100px]"></div>
+            <div class="absolute bottom-20 right-10 w-64 h-64 bg-accent/5 rounded-full blur-[100px]"></div>
+            <h1
+                class="text-4xl md:text-6xl font-bold leading-tight tracking-tight mb-6 bg-gradient-to-br from-slate-900 via-primary to-accent bg-clip-text text-transparent">
+                Transform Your Business with AI - No Code Required
+            </h1>
+            <p class="text-slate-600 text-lg mb-10 max-w-md mx-auto leading-relaxed">
+                Unlock powerful insights and professional automation without writing a single line of code. Deploy in
+                minutes.
+            </p>
+            <div class="flex flex-col w-full gap-4 max-w-xs">
+                <a href="{% url 'register_page' %}"
+                    class="bg-primary text-white py-4 px-8 rounded-xl font-bold text-lg hover:scale-105 transition-transform glow-button flex items-center justify-center gap-2">
+                    Get Started Free <span class="material-symbols-outlined">arrow_forward</span>
+                </a>
+                <button
+                    class="bg-slate-100 border border-slate-200 py-4 px-8 rounded-xl font-semibold text-lg hover:bg-slate-200 transition-colors">
+                    Watch Demo
+                </button>
+            </div>
+            <div
+                class="mt-16 w-full max-w-sm mx-auto aspect-video rounded-2xl border border-primary/20 overflow-hidden relative glass shadow-xl shadow-primary/5">
+                <div class="absolute inset-0 flex items-center justify-center bg-primary/5">
+                    <span class="material-symbols-outlined text-primary text-6xl">play_circle</span>
+                </div>
+                <img class="w-full h-full object-cover opacity-60" data-alt="Abstract AI neural network visual"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkrnseyqYO8fvRk3yAPY4X1hmNGEYKUL6zzWBKV2vqK8qT37wHei3gQCve7E8EYznD_yMScsRsBzA8mqVF5j8CJ6lw17zrsvAlHLmottctPF81NSvqznXmfr7OVyg13HzzlBBZatKqz4AT4FAoKCu1ef5yf-HzCw5qEUdStp2SMcajyVCsJqNoi2I0PaiSoZE-R0TaUp_PoUWOw1NJdbCGGbMaAstyGrotPV6Xwgm5JHDObOZpw9pbYVGu9_SlMLeN4Nb-HAYeWYE" />
+            </div>
+        </section>
+        <!-- How It Works Section -->
+        <section class="py-24 px-6 bg-slate-50/50">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl font-bold text-center mb-16 text-slate-800">How It Works</h2>
+                <div class="space-y-12 relative">
+                    <!-- Connector Line -->
+                    <div
+                        class="absolute left-6 top-8 bottom-8 w-0.5 bg-gradient-to-b from-primary/30 via-primary to-accent/30 hidden md:block md:left-1/2">
+                    </div>
+                    <!-- Step 1 -->
+                    <div class="flex flex-col md:flex-row items-center gap-8 relative">
+                        <div
+                            class="z-10 flex size-12 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/20 font-bold">
+                            1</div>
+                        <div class="flex-1 p-6 rounded-2xl bg-white border border-slate-200 w-full shadow-sm">
+                            <span class="material-symbols-outlined text-primary text-4xl mb-4 block">cloud_sync</span>
+                            <h3 class="text-xl font-bold mb-2">Connect Data</h3>
+                            <p class="text-slate-600">Seamlessly integrate with Google Sheets, Airtable, or your
+                                existing CRM tools.</p>
+                        </div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="flex flex-col md:flex-row items-center gap-8 relative">
+                        <div
+                            class="z-10 flex size-12 items-center justify-center rounded-full bg-accent text-white shadow-lg shadow-accent/20 font-bold">
+                            2</div>
+                        <div class="flex-1 p-6 rounded-2xl bg-white border border-slate-200 w-full shadow-sm">
+                            <span
+                                class="material-symbols-outlined text-accent text-4xl mb-4 block">model_training</span>
+                            <h3 class="text-xl font-bold mb-2">Choose AI Model</h3>
+                            <p class="text-slate-600">Select from pre-trained templates optimized for sales, marketing,
+                                or operations.</p>
+                        </div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="flex flex-col md:flex-row items-center gap-8 relative">
+                        <div
+                            class="z-10 flex size-12 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/20 font-bold">
+                            3</div>
+                        <div class="flex-1 p-6 rounded-2xl bg-white border border-slate-200 w-full shadow-sm">
+                            <span class="material-symbols-outlined text-primary text-4xl mb-4 block">insights</span>
+                            <h3 class="text-xl font-bold mb-2">Get Insights</h3>
+                            <p class="text-slate-600">Receive automated reports and trigger workflows based on AI
+                                recommendations.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Features Grid -->
+        <section class="py-24 px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-bold mb-4">Powerful Features</h2>
+                    <p class="text-slate-600">Everything you need to scale your intelligence.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Feature Card 1 -->
+                    <div
+                        class="bg-white p-8 rounded-2xl border border-slate-200 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all flex flex-col h-full">
+                        <div class="size-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6">
+                            <span class="material-symbols-outlined text-primary text-3xl">query_stats</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Smart Analytics</h3>
+                        <p class="text-slate-600 flex-grow">Advanced predictive modeling that identifies trends before
+                            they happen.</p>
+                    </div>
+                    <!-- Feature Card 2 -->
+                    <div
+                        class="bg-white p-8 rounded-2xl border border-slate-200 hover:border-accent/40 hover:shadow-xl hover:shadow-accent/5 transition-all flex flex-col h-full">
+                        <div class="size-14 rounded-xl bg-accent/10 flex items-center justify-center mb-6">
+                            <span class="material-symbols-outlined text-accent text-3xl">auto_mode</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Automated Workflows</h3>
+                        <p class="text-slate-600 flex-grow">Connect your favorite apps and let AI handle repetitive
+                            administrative tasks.</p>
+                    </div>
+                    <!-- Feature Card 3 -->
+                    <div
+                        class="bg-white p-8 rounded-2xl border border-slate-200 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all flex flex-col h-full md:col-span-2 lg:col-span-1">
+                        <div class="size-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6">
+                            <span class="material-symbols-outlined text-primary text-3xl">support_agent</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">24/7 AI Support</h3>
+                        <p class="text-slate-600 flex-grow">Intelligent customer service agents that learn from your own
+                            documentation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- CTA Section -->
+        <section class="py-20 px-6">
+            <div
+                class="max-w-4xl mx-auto rounded-3xl p-10 bg-slate-900 text-white relative overflow-hidden text-center">
+                <div
+                    class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-64 h-64 bg-primary/20 rounded-full blur-[80px]">
+                </div>
+                <div
+                    class="absolute bottom-0 left-0 translate-y-1/2 -translate-x-1/2 w-64 h-64 bg-accent/10 rounded-full blur-[80px]">
+                </div>
+                <h2 class="text-3xl font-bold mb-6 relative z-10">Ready to automate?</h2>
+                <p class="text-slate-400 mb-8 max-w-lg mx-auto relative z-10">Join 500+ businesses scaling smarter with
+                    our no-code AI tools. No credit card required to start.</p>
+                <a href="{% url 'register_page' %}"
+                    class="bg-primary text-white py-4 px-10 rounded-xl font-bold text-lg glow-button hover:opacity-90 transition-all relative z-10 inline-block">
+                    Get Started
+                </a>
+            </div>
+        </section>
+    </main>
+    <!-- Bottom Nav Bar (Mobile Only) -->
+    <div class="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-slate-100 md:hidden">
+        <div class="flex gap-2 px-4 pb-4 pt-2">
+            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+                <span class="material-symbols-outlined text-[24px]">home</span>
+                <p class="text-xs font-medium leading-normal">Home</p>
+            </a>
+            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400" href="#">
+                <span class="material-symbols-outlined text-[24px]">grid_view</span>
+                <p class="text-xs font-medium leading-normal">Features</p>
+            </a>
+            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400" href="#">
+                <span class="material-symbols-outlined text-[24px]">terminal</span>
+                <p class="text-xs font-medium leading-normal">Workflow</p>
+            </a>
+            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400" href="#">
+                <span class="material-symbols-outlined text-[24px]">person</span>
+                <p class="text-xs font-medium leading-normal">Account</p>
+            </a>
+        </div>
+    </div>
+    <!-- Spacer for bottom nav on mobile -->
+    <div class="h-20 md:hidden"></div>
+</body>
+
+</html>

@@ -6,20 +6,30 @@ from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def handle_login(request):
+    if request.user.is_authenticated:
+        return redirect("dashboard")
     if request.method == "GET":
-        return render(request,"accounts/login.html")
+        success_msg = None
+        if request.session.pop('registration_success', False):
+            success_msg = "User Registered Successfully. Please log in."
+        return render(request,"accounts/login.html", {"success": success_msg})
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
         login_result = authenticate(username = email, password = password)
         if login_result:
             django_login(request,user=login_result)
-            return redirect("form_page")
+            is_new_user = request.session.pop('is_new_user', False)
+            if is_new_user:
+                return redirect("form_page")
+            return redirect("dashboard")
         else:
             return render(request,"accounts/login.html",{"error":"Invalid email or password"})
         
         
 def register(request):
+    if request.user.is_authenticated:
+        return redirect("dashboard")
     if request.method == "GET":
         return render(request,"accounts/register.html")
     if request.method == "POST":
@@ -35,12 +45,14 @@ def register(request):
 
         try:
             existing_user = User.objects.get(email=email)
-            return render(request,"accounts/register.html",{'error':"Already the user exists with this email"})
+            return render(request,"accounts/register.html",{'error':"This email is already registered. Please login."})
         except User.DoesNotExist:
             try:
                 # Use email as username as well based on your code
                 User.objects.create_user(username=email,email=email,first_name=first_name,last_name=last_name,password=password)
-                return render(request,"accounts/register.html",{'success':"User Registered Successfully"})
+                request.session['is_new_user'] = True
+                request.session['registration_success'] = True
+                return redirect("login_page")
             except Exception as e:
                 return render(request,"accounts/register.html",{'error':str(e)})
         
@@ -52,6 +64,9 @@ def dashboard_view(request):
 @login_required
 def front_page(request):
     return render(request,"accounts/front.html")
+
+def portfolio_view(request):
+    return render(request, "accounts/portfolio.html")
 
 @login_required
 def form_page(request):
