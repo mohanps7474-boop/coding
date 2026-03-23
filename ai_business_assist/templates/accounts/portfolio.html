@@ -71,14 +71,14 @@
         <nav class="hidden md:flex items-center gap-8">
             <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Features</a>
             <a class="text-sm font-medium hover:text-primary transition-colors" href="#">How It Works</a>
-            <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Sign In</a>
-            <button
+            <a class="text-sm font-medium hover:text-primary transition-colors" href="{% url 'login_page' %}">Sign In</a>
+            <a href="{% url 'register_page' %}"
                 class="bg-primary text-white py-2 px-5 rounded-lg font-bold text-sm hover:scale-105 transition-transform glow-button">
                 Get Started
-            </button>
+            </a>
         </nav>
         <div class="flex md:hidden items-center gap-4">
-            <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Login</a>
+            <a class="text-sm font-medium hover:text-primary transition-colors" href="{% url 'login_page' %}">Login</a>
         </div>
     </header>
     <main class="overflow-x-hidden">
@@ -99,10 +99,10 @@
                 minutes.
             </p>
             <div class="flex flex-col w-full gap-4 max-w-xs">
-                <button
+                <a href="{% url 'register_page' %}"
                     class="bg-primary text-white py-4 px-8 rounded-xl font-bold text-lg hover:scale-105 transition-transform glow-button flex items-center justify-center gap-2">
-                    Get Started Free <span class="material-symbols-outlined">arrow_forward</span>
-                </button>
+                    Get Started <span class="material-symbols-outlined">arrow_forward</span>
+                </a>
                 <button
                     class="bg-slate-200 dark:bg-primary/10 border border-primary/20 py-4 px-8 rounded-xl font-semibold text-lg hover:bg-primary/20 transition-colors">
                     Watch Demo
@@ -217,10 +217,10 @@
                 <h2 class="text-3xl font-bold mb-6">Ready to automate?</h2>
                 <p class="text-slate-600 dark:text-slate-400 mb-8 max-w-lg mx-auto">Join 500+ businesses scaling smarter
                     with our no-code AI tools. Experience the power of professional automation today.</p>
-                <button
-                    class="bg-primary text-white py-4 px-10 rounded-xl font-bold text-lg glow-button hover:opacity-90 transition-all">
+                <a href="{% url 'register_page' %}"
+                    class="bg-primary text-white py-4 px-10 rounded-xl font-bold text-lg glow-button hover:opacity-90 transition-all inline-block">
                     Get Started
-                </button>
+                </a>
             </div>
         </section>
     </main>
