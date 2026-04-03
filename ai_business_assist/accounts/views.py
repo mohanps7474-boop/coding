@@ -2,6 +2,9 @@ from django.shortcuts import render,redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login as django_login,logout
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+from .utils import send_welcome_email
+
 
 
 # Create your views here.
@@ -52,6 +55,10 @@ def register(request):
                 User.objects.create_user(username=email,email=email,first_name=first_name,last_name=last_name,password=password)
                 request.session['is_new_user'] = True
                 request.session['registration_success'] = True
+                
+                # Send welcome email using the utility
+                send_welcome_email(email)
+                
                 return redirect("login_page")
             except Exception as e:
                 return render(request,"accounts/register.html",{'error':str(e)})
@@ -105,3 +112,91 @@ def validate_password(password,conf_password):
 
     if contains_alphabet == False or contains_number == False or contains_char == False or contains_caps == False or contains_small == False:
         return "Password should be a combination of alphabates,numbers and spcial charecters and one uppercase and lowercase letter."
+
+@login_required
+def test_email_view(request):
+    """
+    View to manually test email sending to the currently logged in user.
+    """
+    from .utils import send_welcome_email
+    email_success = send_welcome_email(request.user.email)
+    if email_success:
+        return render(request, "accounts/dashboard.html", {"message": "Test email sent successfully to your registered email!"})
+    else:
+        return render(request, "accounts/dashboard.html", {"error": "Failed to send test email. Please check your SMTP settings."})
+
+@login_required
+def gmail_view(request):
+    """
+    View to send a custom email using Gmail SMTP.
+    Supports GET parameters for pre-filling the form from the Chatbot.
+    """
+    context = {
+        'recipient': request.GET.get('recipient', ''),
+        'subject': request.GET.get('subject', ''),
+        'message': request.GET.get('message', ''),
+    }
+
+    if request.method == "POST":
+        recipient = request.POST.get("recipient")
+        subject = request.POST.get("subject")
+        message = request.POST.get("message")
+        
+        from .utils import send_custom_email
+        success, error_msg = send_custom_email(recipient, subject, message)
+        if success:
+            context["success"] = f"Email successfully sent to {recipient}!"
+        else:
+            context["error"] = f"Failed to send email. SMTP Error: {error_msg}"
+            
+    return render(request, "accounts/gmail.html", context)
+@login_required
+def settings_view(request):
+    """
+    View for Account Management, Security, and App Information.
+    """
+    context = {
+        'user': request.user,
+        'active_tab': request.GET.get('tab', 'account')
+    }
+    
+    if request.method == "POST":
+        action = request.POST.get('action')
+        
+        if action == 'update_profile':
+            request.user.first_name = request.POST.get('first_name', request.user.first_name)
+            request.user.last_name = request.POST.get('last_name', request.user.last_name)
+            request.user.save()
+            context['success'] = "Profile updated successfully."
+            
+        elif action == 'update_email':
+            new_email = request.POST.get('email')
+            if User.objects.filter(email=new_email).exclude(pk=request.user.pk).exists():
+                context['error'] = "This email is already in use by another account."
+            else:
+                request.user.email = new_email
+                request.user.username = new_email # Since your app uses email as username
+                request.user.save()
+                context['success'] = "Email updated successfully."
+                
+        elif action == 'change_password':
+            from django.contrib.auth import update_session_auth_hash
+            p1 = request.POST.get('new_password')
+            p2 = request.POST.get('conf_password')
+            
+            pwd_error = validate_password(p1, p2)
+            if pwd_error:
+                context['error'] = pwd_error
+            else:
+                request.user.set_password(p1)
+                request.user.save()
+                update_session_auth_hash(request, request.user)
+                context['success'] = "Password changed successfully."
+                
+        elif action == 'delete_account':
+            user = request.user
+            logout(request)
+            user.delete()
+            return redirect('handle_login')
+
+    return render(request, "accounts/settings.html", context)

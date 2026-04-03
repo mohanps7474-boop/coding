@@ -4,8 +4,20 @@
 {% block content %}
 <div class="form_container">
     <h1>Welcome to BizBot Dashboard</h1>
+    {% if message %}
+        <div style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+            {{ message }}
+        </div>
+    {% endif %}
+    {% if error %}
+        <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+            {{ error }}
+        </div>
+    {% endif %}
     <p>You are logged in as {{ user.username }}</p>
     <div class="input_feilds">
+        <a href="{% url 'test_email' %}" style="display: block; margin-top: 10px; color: #3713ec; font-weight: bold;">Send Test Welcome Email</a>
+        <a href="{% url 'gmail_view' %}" style="display: block; margin-top: 10px; color: #1a1a1a; font-weight: bold;">Open Email Studio (Gmail)</a>
         <a href="{% url 'handle_logout' %}" style="display: block; margin-top: 20px;">Logout</a>
     </div>
 </div>

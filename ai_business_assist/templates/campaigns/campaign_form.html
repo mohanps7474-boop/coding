@@ -1,15 +1,47 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Create Campaign | BizBot{% endblock %}
 
-{% block page_title %}New Campaign{% endblock %}
+{% block page_title %}New Campaign / AI Assistant{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ai-bubble {
+        padding: 0.75rem 1rem;
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        color: var(--text-main);
+    }
+    .suggestion-card {
+        background: rgba(15, 13, 27, 0.4);
+        border: 1px dashed var(--accent);
+        border-radius: 14px;
+        padding: 1.25rem;
+        margin-top: 1rem;
+        display: none;
+    }
+    .suggestion-card h4 { color: var(--accent); margin-bottom: 0.5rem; font-size: 0.95rem; }
+    .suggestion-val { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.5rem; word-break: break-all; }
+    .suggestion-val b { color: var(--text-main); }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="fade-in" style="max-width: 800px; margin: 0 auto;">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-        <!-- Form Column -->
+<div class="fade-in">
+    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 2rem; align-items: start;">
+        
+        <!-- Left: The Canonical Form -->
         <div class="glass-card">
-            <h2 style="margin-bottom: 1.5rem;">Campaign Settings</h2>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                <h2><i class="fas fa-bullhorn" style="color: var(--primary-light);"></i> Campaign Details</h2>
+                <div style="font-size: 0.75rem; color: var(--text-dim);">Fill the form or ask the AI Assistant →</div>
+            </div>
+
             <form method="post" id="campaignForm">
                 {% csrf_token %}
                 {% for field in form %}
@@ -17,85 +49,193 @@
                     <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                     {{ field }}
                     {% if field.errors %}
-                    <div style="color: var(--secondary); font-size: 0.8rem; margin-top: 0.25rem;">
-                        {{ field.errors|striptags }}
-                    </div>
+                        <div style="color: var(--secondary); font-size: 0.8rem; margin-top: 0.25rem;">{{ field.errors|striptags }}</div>
                     {% endif %}
                 </div>
                 {% endfor %}
+
                 <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                    <button type="submit" class="btn btn-primary" style="flex: 1;">
-                        <i class="fas fa-rocket"></i> Launch
+                    <button type="submit" class="btn btn-primary" style="flex: 2; height: 50px; font-size: 1rem;">
+                        <i class="fas fa-save"></i> Save &amp; Launch Campaign
                     </button>
                     <a href="{% url 'campaign_list' %}" class="btn"
-                        style="background: var(--bg-dark); border: 1px solid var(--glass-border); color: var(--text-dim);">
+                        style="flex: 1; background: var(--bg-dark); border: 1px solid var(--glass-border); color: var(--text-dim); display: flex; align-items: center; justify-content: center;">
                         Cancel
                     </a>
                 </div>
             </form>
         </div>
 
-        <!-- AI Sidebar Column -->
-        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-            <div class="glass-card" style="border: 1px solid var(--primary-light);">
-                <h3 style="color: var(--primary-light); margin-bottom: 1rem;">
-                    <i class="fas fa-magic"></i> AI Content Helper
+        <!-- Right: AI Chatbot Assistant -->
+        <div style="display: flex; flex-direction: column; gap: 1.5rem; position: sticky; top: 1rem;">
+            <div class="glass-card" style="border-top: 4px solid var(--primary-light); background: rgba(15,13,27,0.85);">
+                <h3 style="color: var(--primary-light); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem;">
+                    <i class="fas fa-robot"></i> AI Planner
                 </h3>
-                <p style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1.5rem;">
-                    Describe your goal and let AI suggest a high-converting message.
-                </p>
-                <div class="form-group">
-                    <textarea id="aiPrompt" class="form-input" rows="3"
-                        placeholder="e.g. A message for a 20% discount on summer collection"></textarea>
+                
+                <div id="aiChatArea" style="max-height: 300px; overflow-y: auto; margin-bottom: 1rem; padding-right: 0.5rem;">
+                    <div class="ai-bubble">
+                        Hello! I can help you plan your campaign. Tell me what you want to achieve, and I'll draft the message, pick the best channel, and suggest a time.
+                    </div>
                 </div>
-                <button type="button" class="btn btn-primary" style="width: 100%; justify-content: center;"
-                    id="generateBtn">
-                    Generate Content
+
+                <div class="form-group" style="margin-bottom: 0.75rem;">
+                    <textarea id="aiPrompt" class="form-input" rows="3" 
+                        placeholder="e.g. Schedule a 'Summer Sale' email for tomorrow afternoon with 20% off..."></textarea>
+                </div>
+                
+                <button type="button" class="btn btn-primary" style="width: 100%; justify-content: center;" id="aiGoBtn">
+                    <i class="fas fa-magic"></i> Plan with AI
                 </button>
+
+                <!-- Recommendation Container -->
+                <div class="suggestion-card" id="aiResultCard">
+                    <h4><i class="fas fa-check-circle"></i> AI Recommendation</h4>
+                    <div class="suggestion-val"><b>Name:</b> <span id="resName"></span></div>
+                    <div class="suggestion-val"><b>Channel:</b> <span id="resChannel"></span></div>
+                    <div class="suggestion-val"><b>Scheduled:</b> <span id="resDate"></span></div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 8px; font-size: 0.8rem; margin-bottom: 1rem; max-height: 80px; overflow: hidden; text-overflow: ellipsis;">
+                        <span id="resMsg"></span>
+                    </div>
+                    <button type="button" class="btn btn-primary" style="width: 100%; background: var(--accent); color: white; border: none;" id="applyAiBtn">
+                        Apply to Form
+                    </button>
+                    <p style="font-size: 0.65rem; color: var(--text-dim); text-align: center; margin-top: 0.5rem;">
+                        This will automatically fill all fields for accurate launching.
+                    </p>
+                </div>
             </div>
 
-            <div class="glass-card" id="aiResult" style="display: none; border-left: 4px solid var(--accent);">
-                <h4 style="margin-bottom: 0.5rem; color: var(--accent);">AI Suggestion</h4>
-                <p id="aiContentText" style="font-size: 0.9rem; margin-bottom: 1rem;"></p>
-                <button type="button" class="btn"
-                    style="font-size: 0.8rem; padding: 0.4rem 0.8rem; background: var(--bg-dark); border: 1px solid var(--glass-border); color: var(--text-main);"
-                    id="useContentBtn">
-                    Use this message
-                </button>
+            <div class="glass-card" style="padding: 1.25rem;">
+                <h4 style="margin-bottom: 0.75rem; font-size: 0.85rem; color: var(--text-dim);">TIPS FOR BEST RESULTS</h4>
+                <ul style="font-size: 0.75rem; color: var(--text-dim); padding-left: 1.2rem; margin: 0; line-height: 1.6;">
+                    <li>Mention the <b>channel</b> (Email/SMS)</li>
+                    <li>Specify the <b>time</b> (e.g. "next Friday at 10am")</li>
+                    <li>Include any <b>discount codes</b></li>
+                </ul>
             </div>
         </div>
+
     </div>
 </div>
 
-{% block extra_js %}
 <script>
-    document.getElementById('generateBtn').addEventListener('click', function () {
-        const prompt = document.getElementById('aiPrompt').value;
-        if (!prompt) return;
+    const aiGoBtn = document.getElementById('aiGoBtn');
+    const aiPrompt = document.getElementById('aiPrompt');
+    const aiChatArea = document.getElementById('aiChatArea');
+    const aiResultCard = document.getElementById('aiResultCard');
 
-        // Mock AI Generation
-        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
-        this.disabled = true;
+    let currentAiData = null;
 
-        setTimeout(() => {
-            const suggestions = [
-                "🚀 Limited Time Offer! Get 20% OFF our new collection. Use code SUMMER20 at checkout. Shop now!",
-                "Hello! We noticed you haven't visited us in a while. Here's a special 20% discount just for you! 🎁",
-                "Flash Sale! ⚡ The summer deals are heating up. Save 20% on all items today only!"
-            ];
-            const result = suggestions[Math.floor(Math.random() * suggestions.length)];
+    aiGoBtn.addEventListener('click', async function() {
+        const promptText = aiPrompt.value.trim();
+        if(!promptText) return;
 
-            document.getElementById('aiContentText').innerText = result;
-            document.getElementById('aiResult').style.display = 'block';
-            this.innerHTML = 'Generate Again';
-            this.disabled = false;
-        }, 1200);
+        // Visual feedback
+        const userMsg = document.createElement('div');
+        userMsg.style = "padding: 0.7rem; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 1rem; font-size: 0.8rem; text-align: right;";
+        userMsg.textContent = promptText;
+        aiChatArea.appendChild(userMsg);
+        aiChatArea.scrollTop = aiChatArea.scrollHeight;
+        
+        aiPrompt.value = '';
+        aiGoBtn.disabled = true;
+        aiGoBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Brainstorming...';
+
+        try {
+            const resp = await fetch("{% url 'campaign_ai_suggest' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ prompt: promptText })
+            });
+            const result = await resp.json();
+
+            if(result.success && result.data) {
+                currentAiData = result.data;
+                
+                // Show in bubble
+                const botMsg = document.createElement('div');
+                botMsg.className = 'ai-bubble';
+                botMsg.textContent = "I've drafted a plan for you! You can see the details below and apply them to your campaign form.";
+                aiChatArea.appendChild(botMsg);
+                
+                // Show result card
+                document.getElementById('resName').textContent = currentAiData.name || 'Untitled';
+                document.getElementById('resChannel').textContent = currentAiData.channel || 'EMAIL';
+                document.getElementById('resDate').textContent = currentAiData.schedule || 'Immediate';
+                document.getElementById('resMsg').textContent = currentAiData.content || '';
+                
+                aiResultCard.style.display = 'block';
+            } else {
+                const botErr = document.createElement('div');
+                botErr.className = 'ai-bubble';
+                botErr.style.color = '#f87171';
+                botErr.textContent = "Sorry, I had trouble planning that. Could you try rephrasing?";
+                aiChatArea.appendChild(botErr);
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            aiGoBtn.disabled = false;
+            aiGoBtn.innerHTML = '<i class="fas fa-magic"></i> Plan with AI';
+            aiChatArea.scrollTop = aiChatArea.scrollHeight;
+        }
     });
 
-    document.getElementById('useContentBtn').addEventListener('click', function () {
-        const content = document.getElementById('aiContentText').innerText;
-        document.querySelector('textarea[name="content"]').value = content;
+    document.getElementById('applyAiBtn').addEventListener('click', function() {
+        if(!currentAiData) return;
+        
+        // Multi-stage selector for maximum robustness
+        const find = (name) => document.getElementById('id_' + name) || document.querySelector(`[name="${name}"]`);
+        
+        const fName    = find('name');
+        const fChannel = find('channel');
+        const fContent = find('content');
+        const fTime    = find('schedule_time');
+
+        if(fName)    fName.value    = currentAiData.name    || '';
+        if(fContent) fContent.value = currentAiData.content || '';
+        
+        if(fChannel) {
+            const val = (currentAiData.channel || 'EMAIL').toUpperCase();
+            // Try to find matching option value
+            for(let opt of fChannel.options) {
+                if(opt.value.toUpperCase() === val) {
+                    fChannel.value = opt.value;
+                    break;
+                }
+            }
+        }
+        
+        if(fTime && currentAiData.schedule) {
+            // ISO format fixer (replace space with T)
+            fTime.value = currentAiData.schedule.replace(' ', 'T').substring(0, 16);
+        }
+
+        // --- Premium Visual Feedback: Glow for all found fields ---
+        [fName, fChannel, fContent, fTime].forEach(f => {
+            if(f) {
+                f.style.borderColor = '#10b981';
+                f.style.boxShadow   = '0 0 15px rgba(16, 185, 129, 0.4)';
+                f.style.background  = 'rgba(16, 185, 129, 0.05)';
+                f.focus(); // Scroll to/highlight the area
+                setTimeout(() => {
+                    f.style.borderColor = '';
+                    f.style.boxShadow   = '';
+                    f.style.background  = '';
+                }, 1500);
+            }
+        });
+        
+        this.innerHTML = '<i class="fas fa-check"></i> Form Populated Successfully';
+        this.style.background = '#059669';
+        setTimeout(() => {
+            this.innerHTML = 'Apply to Form';
+            this.style.background = 'var(--accent)';
+        }, 3000);
     });
 </script>
-{% endblock %}
 {% endblock %}

@@ -51,7 +51,7 @@
             </li>
         </ul>
         <div class="nav-item" style="margin-top: auto;">
-            <a href="#" class="nav-link">
+            <a href="{% url 'settings' %}" class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
             </a>

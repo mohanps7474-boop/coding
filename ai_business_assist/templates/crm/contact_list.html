@@ -5,6 +5,132 @@
 {% block page_title %}Contact Management{% endblock %}
 
 {% block content %}
+<style>
+    /* Edit button */
+    .btn-edit {
+        background: rgba(99, 102, 241, 0.15);
+        color: #818cf8;
+        border: 1px solid rgba(99, 102, 241, 0.35);
+        padding: 0.35rem 0.75rem;
+        border-radius: 0.4rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        text-decoration: none;
+        transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    }
+    .btn-edit:hover {
+        background: rgba(99, 102, 241, 0.3);
+        box-shadow: 0 0 12px rgba(99, 102, 241, 0.35);
+        transform: scale(1.04);
+    }
+
+    /* Delete button */
+    .btn-danger {
+        background: rgba(239, 68, 68, 0.15);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.35);
+        padding: 0.35rem 0.75rem;
+        border-radius: 0.4rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    }
+    .btn-danger:hover {
+        background: rgba(239, 68, 68, 0.3);
+        box-shadow: 0 0 12px rgba(239, 68, 68, 0.35);
+        transform: scale(1.04);
+    }
+
+    .action-cell {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    /* Modal overlay */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-overlay.active {
+        display: flex;
+    }
+    .modal-box {
+        background: var(--card-bg, #1e1b2e);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        border-radius: 1rem;
+        padding: 2rem;
+        max-width: 400px;
+        width: 90%;
+        box-shadow: 0 0 40px rgba(239, 68, 68, 0.2);
+        text-align: center;
+        animation: popIn 0.2s ease;
+    }
+    @keyframes popIn {
+        from { transform: scale(0.85); opacity: 0; }
+        to   { transform: scale(1);    opacity: 1; }
+    }
+    .modal-icon {
+        font-size: 2.5rem;
+        color: #f87171;
+        margin-bottom: 0.75rem;
+    }
+    .modal-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    .modal-subtitle {
+        font-size: 0.9rem;
+        color: var(--text-dim, #94a3b8);
+        margin-bottom: 1.5rem;
+    }
+    .modal-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+    }
+    .modal-cancel {
+        background: rgba(255,255,255,0.07);
+        border: 1px solid rgba(255,255,255,0.12);
+        color: inherit;
+        padding: 0.55rem 1.25rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .modal-cancel:hover { background: rgba(255,255,255,0.13); }
+    .modal-confirm {
+        background: #ef4444;
+        color: #fff;
+        border: none;
+        padding: 0.55rem 1.25rem;
+        border-radius: 0.5rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s, box-shadow 0.2s;
+    }
+    .modal-confirm:hover {
+        background: #dc2626;
+        box-shadow: 0 0 14px rgba(239,68,68,0.5);
+    }
+</style>
+
 <div class="fade-in">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
         <p style="color: var(--text-dim);">Manage your customers and leads here.</p>
@@ -22,6 +148,7 @@
                     <th>PHONE</th>
                     <th>TAGS</th>
                     <th>ADDED</th>
+                    <th>ACTIONS</th>
                 </tr>
             </thead>
             <tbody>
@@ -32,16 +159,25 @@
                     <td style="color: var(--text-dim);">{{ contact.phone_number }}</td>
                     <td>
                         {% for tag in contact.tags.all %}
-                        <span class="badge">
-                            {{ tag.name }}
-                        </span>
+                        <span class="badge">{{ tag.name }}</span>
                         {% endfor %}
                     </td>
                     <td style="color: var(--text-dim);">{{ contact.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <div class="action-cell">
+                            <a href="{% url 'contact_edit' contact.pk %}" class="btn-edit">
+                                <i class="fas fa-pen"></i> Edit
+                            </a>
+                            <button class="btn-danger" data-pk="{{ contact.pk }}" data-name="{{ contact|escapejs }}"
+                                onclick="openDeleteModal(this.dataset.pk, this.dataset.name)">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </div>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" style="padding: 3rem; text-align: center; color: var(--text-dim);">
+                    <td colspan="6" style="padding: 3rem; text-align: center; color: var(--text-dim);">
                         <i class="fas fa-users fa-3x" style="margin-bottom: 1rem; opacity: 0.3;"></i>
                         <p>No contacts found. Start by adding one!</p>
                     </td>
@@ -51,4 +187,37 @@
         </table>
     </div>
 </div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+        <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <div class="modal-title">Delete Contact?</div>
+        <div class="modal-subtitle" id="modalSubtitle">This action cannot be undone.</div>
+        <div class="modal-actions">
+            <button class="modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+            <form id="deleteForm" method="post" action="">
+                {% csrf_token %}
+                <button type="submit" class="modal-confirm">
+                    <i class="fas fa-trash-alt"></i> Yes, Delete
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openDeleteModal(pk, name) {
+        document.getElementById('deleteForm').action = '/crm/delete/' + pk + '/';
+        document.getElementById('modalSubtitle').textContent =
+            'Are you sure you want to delete "' + name + '"? This cannot be undone.';
+        document.getElementById('deleteModal').classList.add('active');
+    }
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.remove('active');
+    }
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+        if (e.target === this) closeDeleteModal();
+    });
+</script>
 {% endblock %}

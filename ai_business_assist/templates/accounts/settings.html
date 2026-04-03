@@ -1,0 +1,396 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Settings - BizBot{% endblock %}
+{% block page_title %}Settings{% endblock %}
+
+{% block extra_css %}
+<style>
+    .settings-container {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: 2rem;
+        margin-top: 1rem;
+    }
+
+    .settings-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .settings-nav-item {
+        padding: 1rem;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--glass-border);
+        color: var(--text-dim);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+    }
+
+    .settings-nav-item:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text-main);
+        transform: translateX(5px);
+    }
+
+    .settings-nav-item.active {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .settings-content {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 2.5rem;
+    }
+
+    .settings-section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .settings-group {
+        margin-bottom: 2.5rem;
+    }
+
+    .settings-group-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-dim);
+        margin-bottom: 1.25rem;
+        display: block;
+    }
+
+    .input-field {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        background: rgba(15, 13, 27, 0.6);
+        border: 1px solid var(--glass-border);
+        border-radius: 10px;
+        color: var(--text-main);
+        outline: none;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+
+    .input-field:focus {
+        border-color: var(--primary);
+        background: rgba(15, 13, 27, 0.8);
+        box-shadow: 0 0 15px rgba(99, 102, 241, 0.1);
+    }
+
+    .settings-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .settings-card-info h4 {
+        margin: 0;
+        font-size: 1rem;
+        color: var(--text-main);
+    }
+
+    .settings-card-info p {
+        margin: 0.25rem 0 0;
+        font-size: 0.85rem;
+        color: var(--text-dim);
+    }
+
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 48px;
+        height: 24px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.1);
+        transition: .4s;
+        border-radius: 24px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked + .slider {
+        background-color: var(--primary);
+    }
+
+    input:checked + .slider:before {
+        transform: translateX(24px);
+    }
+
+    .danger-zone {
+        border-color: rgba(239, 68, 68, 0.2);
+        background: rgba(239, 68, 68, 0.02);
+    }
+
+    .btn-danger {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-danger:hover {
+        background: #ef4444;
+        color: white;
+    }
+
+    @media (max-width: 900px) {
+        .settings-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .settings-nav {
+            flex-direction: row;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+        
+        .settings-nav-item {
+            white-space: nowrap;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <!-- Sidebar Navigation -->
+    <div class="settings-nav">
+        <a href="?tab=account" class="settings-nav-item {% if active_tab == 'account' %}active{% endif %}">
+            <i class="fas fa-user-circle"></i> Account Management
+        </a>
+        <a href="?tab=security" class="settings-nav-item {% if active_tab == 'security' %}active{% endif %}">
+            <i class="fas fa-shield-alt"></i> Security
+        </a>
+        <a href="?tab=legal" class="settings-nav-item {% if active_tab == 'legal' %}active{% endif %}">
+            <i class="fas fa-file-contract"></i> Terms & Policy
+        </a>
+        <a href="?tab=about" class="settings-nav-item {% if active_tab == 'about' %}active{% endif %}">
+            <i class="fas fa-info-circle"></i> About
+        </a>
+    </div>
+
+    <!-- Content Area -->
+    <div class="settings-content">
+        {% if active_tab == 'account' %}
+        <div class="settings-section">
+            <h2 class="settings-section-title"><i class="fas fa-user-edit"></i> Account Management</h2>
+            
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_profile">
+                <div class="settings-group">
+                    <span class="settings-group-label">Personal Information</span>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label style="font-size: 0.75rem; color: var(--text-dim);">First Name</label>
+                            <input type="text" name="first_name" class="input-field" value="{{ user.first_name }}">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.75rem; color: var(--text-dim);">Last Name</label>
+                            <input type="text" name="last_name" class="input-field" value="{{ user.last_name }}">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">Update Profile</button>
+                </div>
+            </form>
+
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_email">
+                <div class="settings-group">
+                    <span class="settings-group-label">Email Address</span>
+                    <label style="font-size: 0.75rem; color: var(--text-dim);">Registered Email</label>
+                    <input type="email" name="email" class="input-field" value="{{ user.email }}">
+                    <button type="submit" class="btn btn-primary">Change Email</button>
+                </div>
+            </form>
+
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="change_password">
+                <div class="settings-group">
+                    <span class="settings-group-label">Security Credentials</span>
+                    <label style="font-size: 0.75rem; color: var(--text-dim);">New Password</label>
+                    <input type="password" name="new_password" class="input-field" placeholder="Minimum 8 characters with symbols">
+                    <label style="font-size: 0.75rem; color: var(--text-dim);">Confirm New Password</label>
+                    <input type="password" name="conf_password" class="input-field">
+                    <button type="submit" class="btn btn-primary">Update Password</button>
+                </div>
+            </form>
+
+            <div class="settings-group">
+                <span class="settings-group-label" style="color: #ef4444;">Danger Zone</span>
+                <div class="settings-card danger-zone">
+                    <div class="settings-card-info">
+                        <h4>Deactivate Account</h4>
+                        <p>Temporarily disable your profile and visibility.</p>
+                    </div>
+                    <button class="btn-danger">Deactivate</button>
+                </div>
+                <div class="settings-card danger-zone">
+                    <div class="settings-card-info">
+                        <h4>Delete Account</h4>
+                        <p>Permanently remove your account and all data. This cannot be undone.</p>
+                    </div>
+                    <form method="POST" onsubmit="return confirm('Wait! This will permanently delete your BizBot account. Are you absolutely sure?')">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="delete_account">
+                        <button type="submit" class="btn-danger">Delete Forever</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {% elif active_tab == 'security' %}
+        <div class="settings-section">
+            <h2 class="settings-section-title"><i class="fas fa-shield-check"></i> Security Settings</h2>
+            
+            <div class="settings-group">
+                <span class="settings-group-label">Two-Factor Authentication (2FA)</span>
+                <div class="settings-card">
+                    <div class="settings-card-info">
+                        <h4>App-based Authentication</h4>
+                        <p>Use Google Authenticator or Authy for extra security.</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="settings-card">
+                    <div class="settings-card-info">
+                        <h4>Website Sounds</h4>
+                        <p>Enable security alerts and notification sounds.</p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <span class="settings-group-label">Third-Party Connections</span>
+                <div class="settings-card">
+                    <div class="settings-card-info">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fab fa-google" style="color: #4285F4;"></i>
+                            <h4>Google Login</h4>
+                        </div>
+                        <p>Currently linked to <b>{{ user.email }}</b></p>
+                    </div>
+                    <button class="btn" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);">Unlink</button>
+                </div>
+            </div>
+        </div>
+
+        {% elif active_tab == 'legal' %}
+        <div class="settings-section">
+            <h2 class="settings-section-title"><i class="fas fa-file-contract"></i> Legal & Agreements</h2>
+            
+            <div class="settings-group">
+                <div class="settings-card" style="cursor: pointer;" onclick="showToast('Loading Terms of Service...')">
+                    <div class="settings-card-info">
+                        <h4>Terms of Service</h4>
+                        <p>Read about your rights and responsibilities using BizBot.</p>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-dim);"></i>
+                </div>
+                <div class="settings-card" style="cursor: pointer;" onclick="showToast('Loading Privacy Policy...')">
+                    <div class="settings-card-info">
+                        <h4>Privacy Policy</h4>
+                        <p>How we handle and protect your data.</p>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-dim);"></i>
+                </div>
+            </div>
+        </div>
+
+        {% elif active_tab == 'about' %}
+        <div class="settings-section">
+            <h2 class="settings-section-title"><i class="fas fa-info-circle"></i> About BizBot</h2>
+            
+            <div class="settings-card" style="flex-direction: column; align-items: flex-start; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <img src="{% static 'img/logo.jpg' %}" alt="BizBot" style="width: 60px; height: 60px; border-radius: 12px;">
+                    <div>
+                        <h3 style="margin: 0; color: var(--text-main);">BizBot v1.0.4</h3>
+                        <p style="margin: 0; color: var(--text-dim);">The no-code AI business assistant.</p>
+                    </div>
+                </div>
+                <p style="font-size: 0.9rem; line-height: 1.6; color: var(--text-dim);">
+                    BizBot was built to empower small business owners with the power of generative AI. 
+                    Manage your CRM, automate emails, and chat with your business data all in one single, glassmorphic interface.
+                </p>
+                <div style="display: flex; gap: 1rem;">
+                    <a href="#" class="nav-link" style="padding: 0; color: var(--primary);"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="nav-link" style="padding: 0; color: var(--primary);"><i class="fab fa-github"></i></a>
+                    <a href="#" class="nav-link" style="padding: 0; color: var(--primary);"><i class="fas fa-globe"></i></a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="toast" style="display:none; position:fixed; bottom: 2rem; right: 2rem; background: var(--primary); color: white; padding: 1rem 2rem; border-radius: 12px; font-weight: 600; box-shadow: 0 10px 30px rgba(99,102,241,0.3); z-index: 1000; transition: all 0.3s ease;"></div>
+
+<script>
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 3000);
+    }
+</script>
+{% endblock %}

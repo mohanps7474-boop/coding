@@ -1,0 +1,68 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %} Send Email via Gmail {% endblock %}
+
+{% block content %}
+<div class="fade-in">
+    <div style="padding: 20px 0 10px 0; text-align: left; width: 100%; max-width: 800px; margin: 0 auto;">
+        <p style="color: #3713ec; font-weight: bold; font-size: 0.9rem;">
+            Dashboard > <span style="color: #1a1a1a;">Email Bot</span>
+        </p>
+    </div>
+
+    <div class="form_container" style="max-width: 800px; margin: 20px auto; padding-top: 20px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #1a1a1a; margin-bottom: 5px;">BizBot Email Studio</h1>
+            <p style="color: #666;">Send personalized business messages using Gmail SMTP</p>
+        </div>
+
+        {% if success %}
+            <div style="background-color: #d4edda; color: #155724; padding: 15px; border-radius: 8px; margin: 0 40px 25px 40px; border-left: 5px solid #28a745;">
+                {{ success }}
+            </div>
+        {% endif %}
+
+        {% if error %}
+            <div style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin: 0 40px 25px 40px; border-left: 5px solid #dc3545;">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <form method="POST" style="padding: 0 40px 40px 40px;">
+            {% csrf_token %}
+            
+            <div class="input_feilds">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #444;">To (Recipient Email)</label>
+                <input type="email" name="recipient" placeholder="client@example.com" value="{{ recipient }}" required 
+                       style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 6px;">
+                
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #444;">Subject</label>
+                <input type="text" name="subject" placeholder="Important Update from BizBot" value="{{ subject }}" required 
+                       style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 6px;">
+                
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #444;">Message Body</label>
+                <textarea name="message" placeholder="Type your message here..." required 
+                          style="width: 100%; padding: 12px; height: 150px; margin-bottom: 25px; border: 1px solid #ddd; border-radius: 6px; resize: vertical;">{{ message }}</textarea>
+                
+                <button type="submit" style="width: 100%; padding: 14px; background-color: #3713ec; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.3s;">
+                    Send Email via Gmail
+                </button>
+            </div>
+        </form>
+
+        <div style="text-align: center; padding-bottom: 30px;">
+            <a href="{% url 'dashboard' %}" style="color: #666; text-decoration: none; font-size: 0.9rem;">&larr; Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fade-in { animation: fadeIn 0.6s ease-out; }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    button:hover { background-color: #2a0fb8 !important; }
+</style>
+{% endblock %}

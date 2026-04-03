@@ -13,9 +13,20 @@
         </a>
     </div>
 
+    {% if messages %}
+        <div style="margin-bottom: 2rem;">
+            {% for message in messages %}
+                <div class="glass-card" style="border-left: 5px solid var(--accent); background: rgba(16, 185, 129, 0.1); color: var(--text-main); font-weight: 600;">
+                    <i class="fas fa-check-circle" style="color: var(--accent); margin-right: 0.5rem;"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
         {% for campaign in campaigns %}
-        <div class="glass-card" style="position: relative; overflow: hidden;">
+        <div class="glass-card" style="position: relative; overflow: hidden; display: flex; flex-direction: column;">
             <div
                 style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
                 <div>
@@ -32,9 +43,24 @@
                 </span>
             </div>
 
-            <p style="color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.5rem;">
-                {{ campaign.content|truncatechars:100 }}
+            <p style="color: var(--text-dim); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.5rem; flex-grow: 1;">
+                {{ campaign.content|truncatechars:150 }}
             </p>
+
+            <!-- Campaign Actions -->
+            <div style="margin-bottom: 1.5rem;">
+                {% if campaign.status == 'DRAFT' %}
+                    <a href="{% url 'campaign_launch' campaign.pk %}" class="btn btn-primary" 
+                       style="width: 100%; justify-content: center; background: linear-gradient(135deg, #10b981, #34d399); border: none; font-weight: 700;"
+                       onclick="this.innerHTML='<i class=\'fas fa-spinner fa-spin\'></i> AI Personalizing & Sending...'; this.style.opacity='0.6'; this.style.pointerEvents='none';">
+                        <i class="fas fa-rocket"></i> Launch to All Contacts
+                    </a>
+                {% elif campaign.status == 'COMPLETED' %}
+                    <div style="text-align: center; font-size: 0.8rem; color: var(--accent); padding: 0.5rem; background: rgba(16,185,129,0.05); border-radius: 8px;">
+                        <i class="fas fa-check-double"></i> Delivered to CRM Contacts
+                    </div>
+                {% endif %}
+            </div>
 
             <div
                 style="display: flex; justify-content: space-between; align-items: center; padding-top: 1.25rem; border-top: 1px solid var(--glass-border);">
@@ -42,14 +68,15 @@
                     <i class="far fa-calendar-alt"></i> {{ campaign.created_at|date:"M d, Y" }}
                 </div>
                 <div style="display: flex; gap: 0.5rem;">
-                    <button class="btn"
-                        style="padding: 0.4rem; background: transparent; border: 1px solid var(--glass-border); color: var(--text-dim);">
+                    <a href="{% url 'campaign_edit' campaign.pk %}" class="btn"
+                        style="padding: 0.4rem 0.6rem; background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); color: var(--text-dim); text-decoration: none; font-size: 0.85rem;">
                         <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn"
-                        style="padding: 0.4rem; background: transparent; border: 1px solid var(--glass-border); color: var(--text-dim);">
+                    </a>
+                    <a href="{% url 'campaign_delete' campaign.pk %}" class="btn"
+                        style="padding: 0.4rem 0.6rem; background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); color: #f87171; text-decoration: none; font-size: 0.85rem;"
+                        onclick="return confirm('Are you sure you want to delete this campaign?');">
                         <i class="fas fa-trash"></i>
-                    </button>
+                    </a>
                 </div>
             </div>
         </div>

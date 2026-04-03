@@ -1,13 +1,21 @@
 {% extends 'base.html' %}
 
-{% block title %}Add Contact | BizBot{% endblock %}
+{% block title %}{% if editing %}Edit Contact{% else %}Add Contact{% endif %} | BizBot{% endblock %}
 
-{% block page_title %}New Contact{% endblock %}
+{% block page_title %}{% if editing %}Edit Contact{% else %}New Contact{% endif %}{% endblock %}
 
 {% block content %}
 <div class="fade-in" style="max-width: 600px; margin: 0 auto;">
     <div class="glass-card">
-        <h2 style="margin-bottom: 1.5rem;">Contact Details</h2>
+        <h2 style="margin-bottom: 1.5rem;">
+            {% if editing %}
+                <i class="fas fa-pen" style="color: #818cf8; margin-right: 0.5rem;"></i>
+                Editing: {{ contact }}
+            {% else %}
+                <i class="fas fa-user-plus" style="margin-right: 0.5rem;"></i>
+                Contact Details
+            {% endif %}
+        </h2>
         <form method="post">
             {% csrf_token %}
             {% for field in form %}
@@ -21,12 +29,41 @@
                 {% endif %}
             </div>
             {% endfor %}
-            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                <button type="submit" class="btn btn-primary" style="flex: 1;">
-                    <i class="fas fa-save"></i> Save Contact
+            <div style="display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap;">
+                <button type="submit" class="btn btn-primary" style="flex: 1; min-width: 200px;">
+                    {% if editing %}
+                        <i class="fas fa-save"></i> Update Contact
+                    {% else %}
+                        <i class="fas fa-save"></i> Save Contact
+                    {% endif %}
                 </button>
+                
+                {% if editing or contact.email %}
+                <a href="{% url 'chatbot' %}?query=Draft a professional email to {{ contact.email }}" 
+                   class="btn" 
+                   style="flex: 1; min-width: 200px; background: linear-gradient(135deg, #10b981, #34d399); color: white; border: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none;">
+                    <i class="fas fa-paper-plane"></i> Send AI Email
+                </a>
+                {% else %}
+                <button type="button" onclick="sendToChatbot()" 
+                   class="btn" 
+                   style="flex: 1; min-width: 200px; background: linear-gradient(135deg, #10b981, #34d399); color: white; border: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none;">
+                    <i class="fas fa-paper-plane"></i> Send AI Email
+                </button>
+                <script>
+                    function sendToChatbot() {
+                        const emailInput = document.querySelector('input[type="email"]');
+                        if (emailInput && emailInput.value) {
+                            window.location.href = "{% url 'chatbot' %}?query=Draft a professional email to " + encodeURIComponent(emailInput.value);
+                        } else {
+                            alert("Please enter an email address first to draft an AI email.");
+                        }
+                    }
+                </script>
+                {% endif %}
+
                 <a href="{% url 'contact_list' %}" class="btn"
-                    style="background: var(--bg-dark); border: 1px solid var(--glass-border); color: var(--text-dim);">
+                    style="flex: 1; min-width: 100px; background: var(--bg-dark); border: 1px solid var(--glass-border); color: var(--text-dim); display: flex; align-items: center; justify-content: center;">
                     Cancel
                 </a>
             </div>
