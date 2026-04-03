@@ -12,23 +12,28 @@ def get_gemini_client():
     
     return genai.Client(api_key=api_key)
 
-def generate_ai_content(prompt, model="models/gemini-2.5-flash"):
+def generate_ai_content(prompt, model=None):
     """
-    Generates content using Gemini. 
-    Switched to gemini-2.5-flash based on availability check.
-    Includes a robust multi-model fallback loop.
+    Generates content using Gemini API with multi-model fallback.
+    Prioritizes lighter models first for better quota management.
     """
     client = get_gemini_client()
     
-    # Try models in order of preference (Gemma 3 prioritized based on key discovery)
+    # Ordered by quota efficiency: lighter models first, then heavier ones
     models_to_try = [
-        "models/gemma-3-27b-it",
-        "models/gemma-3-12b-it",
-        "models/gemma-3-1b-it",
-        "models/gemini-2.5-flash",
+        "models/gemini-2.0-flash-lite",
+        "models/gemini-2.0-flash",
+        "models/gemini-1.5-flash-8b",
         "models/gemini-1.5-flash",
         "models/gemini-1.5-pro",
+        "models/gemma-3-1b-it",
+        "models/gemma-3-12b-it",
+        "models/gemma-3-27b-it",
     ]
+    
+    # If a specific model was requested, try it first
+    if model:
+        models_to_try.insert(0, model)
     
     last_err = None
     for m in models_to_try:
@@ -37,14 +42,15 @@ def generate_ai_content(prompt, model="models/gemini-2.5-flash"):
                 model=m,
                 contents=prompt
             )
-            if response and hasattr(response, 'text'):
+            if response and hasattr(response, 'text') and response.text:
+                print(f"GenAI: Success with {m}")
                 return response.text
         except Exception as e:
             last_err = e
             error_str = str(e)
-            print(f"GenAI: Attempt with {m} failed: {error_str}")
-            if 'RESOURCE_EXHAUSTED' in error_str:
-                # Quota hit, don't keep trying others
+            print(f"GenAI: {m} failed: {error_str[:150]}")
+            # Only stop cycling if ALL requests are exhausted (global quota)
+            if 'RESOURCE_EXHAUSTED' in error_str and 'GenerateContent' not in error_str:
                 break
             continue
             

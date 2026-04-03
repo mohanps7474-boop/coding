@@ -27,6 +27,7 @@ def ai_assistant(request):
     View to interact with the AI Assistant using Gemini API.
     """
     ai_response = None
+    error_msg = None
     if request.method == "POST":
         business_details = request.POST.get("business_details")
         goal = request.POST.get("goal")
@@ -40,13 +41,14 @@ def ai_assistant(request):
         )
         
         ai_response = generate_ai_content(prompt)
+        if not ai_response:
+            error_msg = "AI service is temporarily unavailable. This may be due to API quota limits. Please try again in a few minutes."
     
-    return render(request, 'dashboard/ai_assistant.html', {'ai_response': ai_response})
+    return render(request, 'dashboard/ai_assistant.html', {'ai_response': ai_response, 'error_msg': error_msg})
 
 import re, uuid
 from django.utils import timezone
 
-@login_required
 @login_required
 def chatbot_view(request):
     """
