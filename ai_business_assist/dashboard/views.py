@@ -278,3 +278,34 @@ def send_bulk_email(request):
         'sent_to': sent_to,
         'failed': failed,
     })
+
+
+@login_required
+def analytics_view(request):
+    """
+    Renders simplified Analytics matching dashboard style with a barebones chart.
+    """
+    import random
+    from datetime import timedelta
+    from django.utils import timezone
+    from crm.models import Contact
+    from campaigns.models import Campaign
+    
+    total_contacts = Contact.objects.count()
+    total_campaigns = Campaign.objects.count()
+    
+    mock_views = max(total_campaigns * total_contacts, 1500)
+    mock_clicks = int(mock_views * random.uniform(0.15, 0.35))
+    mock_rate = round((mock_clicks / mock_views) * 100, 1) if mock_views > 0 else 0
+    
+    dates = [(timezone.now() - timedelta(days=i)).strftime('%b %d') for i in range(6, -1, -1)]
+    values = [int(mock_views * (random.uniform(0.1, 0.4)) / 7) for _ in range(7)]
+
+    context = {
+        'mock_views': mock_views,
+        'mock_clicks': mock_clicks,
+        'mock_rate': mock_rate,
+        'dates_json': dates,
+        'values_json': values,
+    }
+    return render(request, 'dashboard/analytics.html', context)

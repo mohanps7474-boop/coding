@@ -3,6 +3,20 @@
 {% block title %}Campaigns | BizBot{% endblock %}
 
 {% block page_title %}Marketing Campaigns{% endblock %}
+{% block extra_css %}
+<style>
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        background: var(--bg-dark);
+        font-weight: 500;
+    }
+    .status-completed { color: var(--accent); }
+    .status-running { color: var(--primary-light); }
+    .status-draft { color: var(--text-dim); }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="fade-in">
@@ -36,9 +50,7 @@
                     </span>
                     <h3 style="margin-top: 0.25rem; font-size: 1.25rem;">{{ campaign.name }}</h3>
                 </div>
-                <span
-                    style="padding: 0.25rem 0.75rem; border-radius: 50px; font-size: 0.75rem; background: var(--bg-dark); 
-                    color: {% if campaign.status == 'COMPLETED' %}var(--accent){% elif campaign.status == 'RUNNING' %}var(--primary-light){% else %}var(--text-dim){% endif %};">
+                <span class="status-badge status-{{ campaign.status|lower }}">
                     {{ campaign.get_status_display }}
                 </span>
             </div>

@@ -34,6 +34,10 @@
         }
     </script>
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Space Grotesk', sans-serif;
         }
@@ -52,6 +56,22 @@
         .glow-button {
             box-shadow: 0 0 20px rgba(89, 13, 242, 0.5);
         }
+
+        @keyframes bounce-subtle {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .animate-bounce-subtle {
+            animation: bounce-subtle 4s ease-in-out infinite;
+        }
     </style>
     <style>
         body {
@@ -69,14 +89,11 @@
             <span class="font-bold text-xl tracking-tight">BizBot</span>
         </div>
         <nav class="hidden md:flex items-center gap-8">
-            <a class="text-sm font-medium hover:text-primary transition-colors" href="#">Features</a>
-            <a class="text-sm font-medium hover:text-primary transition-colors" href="#">How It Works</a>
+            <a class="text-sm font-medium hover:text-primary transition-colors" href="{% url 'about' %}">About</a>
+            <a class="text-sm font-medium hover:text-primary transition-colors" href="#how-it-works">How It Works</a>
+            <a class="text-sm font-medium hover:text-primary transition-colors" href="#features">Features</a>
             <a class="text-sm font-medium hover:text-primary transition-colors" href="{% url 'login_page' %}">Sign
                 In</a>
-            <a href="{% url 'register_page' %}"
-                class="bg-primary text-white py-2 px-5 rounded-lg font-bold text-sm hover:scale-105 transition-transform glow-button">
-                Get Started
-            </a>
         </nav>
         <div class="flex md:hidden items-center gap-4">
             <a class="text-sm font-medium hover:text-primary transition-colors" href="{% url 'login_page' %}">Login</a>
@@ -91,6 +108,8 @@
             <div class="absolute top-20 left-10 w-64 h-64 bg-primary/20 rounded-full blur-[100px]"></div>
             <div class="absolute bottom-20 right-10 w-64 h-64 bg-primary/10 rounded-full blur-[100px]"></div>
 
+            <img src="{% static 'img/logo.jpg' %}" alt="BizBot Logo"
+                class="h-44 w-44 rounded-full object-cover mb-8 neon-border glow-button animate-bounce-subtle">
             <h1
                 class="text-4xl md:text-6xl font-bold leading-tight tracking-tight mb-6 bg-gradient-to-br from-slate-900 via-slate-800 to-primary dark:from-white dark:via-slate-200 dark:to-primary bg-clip-text text-transparent">
                 Transform Your Business with AI - No Code Required
@@ -104,22 +123,10 @@
                     class="bg-primary text-white py-4 px-8 rounded-xl font-bold text-lg hover:scale-105 transition-transform glow-button flex items-center justify-center gap-2">
                     Get Started <span class="material-symbols-outlined">arrow_forward</span>
                 </a>
-                <button
-                    class="bg-slate-200 dark:bg-primary/10 border border-primary/20 py-4 px-8 rounded-xl font-semibold text-lg hover:bg-primary/20 transition-colors">
-                    Watch Demo
-                </button>
-            </div>
-            <div
-                class="mt-16 w-full max-w-sm mx-auto aspect-video rounded-2xl border border-primary/30 overflow-hidden relative glass">
-                <div class="absolute inset-0 flex items-center justify-center bg-primary/5">
-                    <span class="material-symbols-outlined text-primary text-6xl">play_circle</span>
-                </div>
-                <img class="w-full h-full object-cover opacity-50" data-alt="Abstract AI neural network visual"
-                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkrnseyqYO8fvRk3yAPY4X1hmNGEYKUL6zzWBKV2vqK8qT37wHei3gQCve7E8EYznD_yMScsRsBzA8mqVF5j8CJ6lw17zrsvAlHLmottctPF81NSvqznXmfr7OVyg13HzzlBBZatKqz4AT4FAoKCu1ef5yf-HzCw5qEUdStp2SMcajyVCsJqNoi2I0PaiSoZE-R0TaUp_PoUWOw1NJdbCGGbMaAstyGrotPV6Xwgm5JHDObOZpw9pbYVGu9_SlMLeN4Nb-HAYeWYE" />
             </div>
         </section>
         <!-- How It Works Section -->
-        <section class="py-24 px-6 bg-slate-100 dark:bg-slate-900/30">
+        <section id="how-it-works" class="py-24 px-6 bg-slate-100 dark:bg-slate-900/30">
             <div class="max-w-4xl mx-auto">
                 <h2 class="text-3xl font-bold text-center mb-16">How It Works</h2>
                 <div class="space-y-12 relative">
@@ -133,10 +140,10 @@
                             class="z-10 flex size-12 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/40 font-bold">
                             1</div>
                         <div class="flex-1 p-6 rounded-2xl glass border border-primary/20 w-full">
-                            <span class="material-symbols-outlined text-primary text-4xl mb-4 block">cloud_sync</span>
-                            <h3 class="text-xl font-bold mb-2">Connect Data</h3>
-                            <p class="text-slate-600 dark:text-slate-400">Seamlessly integrate with Google Sheets,
-                                Airtable, or your existing CRM tools.</p>
+                            <span class="material-symbols-outlined text-primary text-4xl mb-4 block">chat</span>
+                            <h3 class="text-xl font-bold mb-2">User Interaction</h3>
+                            <p class="text-slate-600 dark:text-slate-400">A customer sends a message through messanger.
+                            </p>
                         </div>
                     </div>
                     <!-- Step 2 -->
@@ -145,11 +152,10 @@
                             class="z-10 flex size-12 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/40 font-bold">
                             2</div>
                         <div class="flex-1 p-6 rounded-2xl glass border border-primary/20 w-full">
-                            <span
-                                class="material-symbols-outlined text-primary text-4xl mb-4 block">model_training</span>
-                            <h3 class="text-xl font-bold mb-2">Choose AI Model</h3>
-                            <p class="text-slate-600 dark:text-slate-400">Select from pre-trained templates optimized
-                                for sales, marketing, or operations.</p>
+                            <span class="material-symbols-outlined text-primary text-4xl mb-4 block">psychology</span>
+                            <h3 class="text-xl font-bold mb-2">AI Understands the Query</h3>
+                            <p class="text-slate-600 dark:text-slate-400">AI analyzes the question and understands the
+                                intent.</p>
                         </div>
                     </div>
                     <!-- Step 3 -->
@@ -158,17 +164,28 @@
                             class="z-10 flex size-12 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/40 font-bold">
                             3</div>
                         <div class="flex-1 p-6 rounded-2xl glass border border-primary/20 w-full">
-                            <span class="material-symbols-outlined text-primary text-4xl mb-4 block">insights</span>
-                            <h3 class="text-xl font-bold mb-2">Get Insights</h3>
-                            <p class="text-slate-600 dark:text-slate-400">Receive automated reports and trigger
-                                workflows based on AI recommendations.</p>
+                            <span class="material-symbols-outlined text-primary text-4xl mb-4 block">magic_button</span>
+                            <h3 class="text-xl font-bold mb-2">Response Generation</h3>
+                            <p class="text-slate-600 dark:text-slate-400">AI generates a proper reply.</p>
+                        </div>
+                    </div>
+                    <!-- Step 4 -->
+                    <div class="flex flex-col md:flex-row items-center gap-8 relative">
+                        <div
+                            class="z-10 flex size-12 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/40 font-bold">
+                            4</div>
+                        <div class="flex-1 p-6 rounded-2xl glass border border-primary/20 w-full">
+                            <span class="material-symbols-outlined text-primary text-4xl mb-4 block">send</span>
+                            <h3 class="text-xl font-bold mb-2">Output to User</h3>
+                            <p class="text-slate-600 dark:text-slate-400">The response is sent back instantly & user
+                                gets quick and accurate information.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
         <!-- Features Grid -->
-        <section class="py-24 px-6">
+        <section id="features" class="py-24 px-6">
             <div class="max-w-4xl mx-auto">
                 <div class="text-center mb-16">
                     <h2 class="text-3xl font-bold mb-4">Powerful Features</h2>
@@ -179,31 +196,31 @@
                     <div
                         class="glass p-8 rounded-2xl neon-border hover:-translate-y-2 transition-transform border border-primary/30 flex flex-col h-full">
                         <div class="size-14 rounded-xl bg-primary/20 flex items-center justify-center mb-6">
-                            <span class="material-symbols-outlined text-primary text-3xl">query_stats</span>
+                            <span class="material-symbols-outlined text-primary text-3xl">robot_2</span>
                         </div>
-                        <h3 class="text-xl font-bold mb-3">Smart Analytics</h3>
-                        <p class="text-slate-600 dark:text-slate-400 flex-grow">Advanced predictive modeling that
-                            identifies trends before they happen.</p>
+                        <h3 class="text-xl font-bold mb-3">AI-Powered Chatbot</h3>
+                        <p class="text-slate-600 dark:text-slate-400 flex-grow">Provides instant replies to customer
+                            queries.</p>
                     </div>
                     <!-- Feature Card 2 -->
                     <div
                         class="glass p-8 rounded-2xl neon-border hover:-translate-y-2 transition-transform border border-primary/30 flex flex-col h-full">
                         <div class="size-14 rounded-xl bg-primary/20 flex items-center justify-center mb-6">
-                            <span class="material-symbols-outlined text-primary text-3xl">auto_mode</span>
+                            <span class="material-symbols-outlined text-primary text-3xl">terminal</span>
                         </div>
-                        <h3 class="text-xl font-bold mb-3">Automated Workflows</h3>
-                        <p class="text-slate-600 dark:text-slate-400 flex-grow">Connect your favorite apps and let AI
-                            handle repetitive administrative tasks.</p>
+                        <h3 class="text-xl font-bold mb-3">Workflow Automation</h3>
+                        <p class="text-slate-600 dark:text-slate-400 flex-grow">Automates repetitive tasks like emails,
+                            updates, and more.</p>
                     </div>
                     <!-- Feature Card 3 -->
                     <div
                         class="glass p-8 rounded-2xl neon-border hover:-translate-y-2 transition-transform border border-primary/30 flex flex-col h-full md:col-span-2 lg:col-span-1">
                         <div class="size-14 rounded-xl bg-primary/20 flex items-center justify-center mb-6">
-                            <span class="material-symbols-outlined text-primary text-3xl">support_agent</span>
+                            <span class="material-symbols-outlined text-primary text-3xl">all_inclusive</span>
                         </div>
-                        <h3 class="text-xl font-bold mb-3">24/7 AI Support</h3>
-                        <p class="text-slate-600 dark:text-slate-400 flex-grow">Intelligent customer service agents that
-                            learn from your own documentation.</p>
+                        <h3 class="text-xl font-bold mb-3">24/7 Availability</h3>
+                        <p class="text-slate-600 dark:text-slate-400 flex-grow">Works anytime without human
+                            intervention.</p>
                     </div>
                 </div>
             </div>
@@ -225,29 +242,6 @@
             </div>
         </section>
     </main>
-    <!-- Bottom Nav Bar -->
-    <div
-        class="fixed bottom-0 left-0 right-0 z-50 bg-background-light dark:bg-background-dark border-t border-primary/10 md:hidden">
-        <div class="flex gap-2 px-4 pb-4 pt-2">
-            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
-                <span class="material-symbols-outlined text-[24px]">home</span>
-                <p class="text-xs font-medium leading-normal">Home</p>
-            </a>
-            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-500 dark:text-slate-400" href="#">
-                <span class="material-symbols-outlined text-[24px]">grid_view</span>
-                <p class="text-xs font-medium leading-normal">Features</p>
-            </a>
-            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-500 dark:text-slate-400" href="#">
-                <span class="material-symbols-outlined text-[24px]">terminal</span>
-                <p class="text-xs font-medium leading-normal">Workflow</p>
-            </a>
-            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-500 dark:text-slate-400" href="#">
-                <span class="material-symbols-outlined text-[24px]">person</span>
-                <p class="text-xs font-medium leading-normal">Account</p>
-            </a>
-        </div>
-    </div>
-    <!-- Spacer for bottom nav -->
     <div class="h-20 md:hidden"></div>
 </body>
 

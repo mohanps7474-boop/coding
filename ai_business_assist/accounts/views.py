@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate,login as django_login,logout
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from .utils import send_welcome_email
+from .models import Profile
 
 
 
@@ -72,13 +73,43 @@ def dashboard_view(request):
 def front_page(request):
     return render(request,"accounts/front.html")
 
-def portfolio_view(request):
-    return render(request, "accounts/portfolio.html")
+def landing_view(request):
+    return render(request, "accounts/landing.html")
 
 @login_required
 def form_page(request):
     if request.method == "POST":
-        # Process form data here if needed
+        # Get data from POST
+        user_name = request.POST.get('user_name')
+        shop_name = request.POST.get('shop_name')
+        email = request.POST.get('email')
+        address = request.POST.get('address')
+        contact = request.POST.get('contact')
+        lat = request.POST.get('latitude')
+        lng = request.POST.get('longitude')
+        shop_profile = request.FILES.get('shop_profile')
+
+        # Update base User fields if changed
+        if user_name:
+            names = user_name.split(' ', 1)
+            request.user.first_name = names[0]
+            if len(names) > 1:
+                request.user.last_name = names[1]
+            request.user.save()
+
+        # Update or create profile
+        profile, created = Profile.objects.get_or_create(user=request.user)
+        profile.shop_name = shop_name
+        profile.address = address
+        profile.contact = contact
+        if lat:
+            profile.latitude = lat
+        if lng:
+            profile.longitude = lng
+        if shop_profile:
+            profile.shop_profile = shop_profile
+        profile.save()
+
         return redirect("front_page")
     return render(request, "accounts/form.html")
 
@@ -155,8 +186,10 @@ def settings_view(request):
     """
     View for Account Management, Security, and App Information.
     """
+    profile, created = Profile.objects.get_or_create(user=request.user)
     context = {
         'user': request.user,
+        'profile': profile,
         'active_tab': request.GET.get('tab', 'account')
     }
     
@@ -167,6 +200,21 @@ def settings_view(request):
             request.user.first_name = request.POST.get('first_name', request.user.first_name)
             request.user.last_name = request.POST.get('last_name', request.user.last_name)
             request.user.save()
+            
+            # Update extended profile fields
+            profile.shop_name = request.POST.get('shop_name', profile.shop_name)
+            profile.contact = request.POST.get('contact', profile.contact)
+            profile.address = request.POST.get('address', profile.address)
+            
+            lat = request.POST.get('latitude')
+            lng = request.POST.get('longitude')
+            if lat: profile.latitude = lat
+            if lng: profile.longitude = lng
+            
+            if 'shop_profile' in request.FILES:
+                profile.shop_profile = request.FILES['shop_profile']
+                
+            profile.save()
             context['success'] = "Profile updated successfully."
             
         elif action == 'update_email':
@@ -200,3 +248,6 @@ def settings_view(request):
             return redirect('handle_login')
 
     return render(request, "accounts/settings.html", context)
+
+def about_view(request):
+    return render(request, "accounts/about.html")

@@ -10,8 +10,9 @@ urlpatterns = [
     path('dashboard/', views.dashboard_view, name='dashboard_view'),
     path('front/', views.front_page, name='front_page'),
     path('setup_form/', views.form_page, name='form_page'),
-    path('portfolio/', views.portfolio_view, name='portfolio'),
+    path('portfolio/', views.landing_view, name='portfolio'),
     path('test-email/', views.test_email_view, name='test_email'),
     path('gmail/', views.gmail_view, name='gmail_view'),
     path('settings/', views.settings_view, name='settings'),
+    path('about/', views.about_view, name='about'),
 ]

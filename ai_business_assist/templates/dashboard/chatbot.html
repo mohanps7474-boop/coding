@@ -4,6 +4,20 @@
 {% block title %}BizBot Chat{% endblock %}
 {% block page_title %}AI Chatbot{% endblock %}
 
+{% block extra_js %}
+<script type="application/json" id="crm-contacts-data">
+[
+    {% for c in crm_contacts %}
+    {
+        "pk": "{{ c.pk|escapejs }}",
+        "name": "{{ c.first_name|escapejs }} {{ c.last_name|escapejs }}",
+        "email": "{{ c.email|escapejs }}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+]
+</script>
+{% endblock %}
+
 {% block content %}
 <style>
     /* ── full-height reset ─────────────────────── */
@@ -23,7 +37,7 @@
         border-radius: 16px;
         border: 1px solid var(--glass-border);
         overflow: hidden;
-        background: var(--bg-dark);
+        background: white;
     }
 
     @media (max-width: 1100px) {
@@ -51,7 +65,7 @@
         display: flex;
         flex-direction: column;
         border-right: 1px solid var(--glass-border);
-        background: rgba(15, 13, 27, 0.95);
+        background: rgba(255, 255, 255, 0.95);
         overflow: hidden;
     }
 
@@ -139,13 +153,13 @@
     }
 
     .conv-item:hover {
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(0, 0, 0, 0.05);
         color: var(--text-main);
     }
 
     .conv-item.active {
         background: rgba(99, 102, 241, 0.18);
-        color: #c7d2fe;
+        color: #3730a3;
     }
 
     .conv-item i {
@@ -172,7 +186,7 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        background: var(--bg-dark);
+        background: white;
     }
 
     .chat-topbar {
@@ -344,7 +358,7 @@
     .chip:hover {
         background: rgba(99, 102, 241, 0.1);
         border-color: #6366f1;
-        color: #c7d2fe;
+        color: #3730a3;
     }
 
     /* Typing indicator */
@@ -401,7 +415,7 @@
         display: flex;
         align-items: flex-end;
         gap: 0.75rem;
-        background: rgba(255, 255, 255, 0.04);
+        background: rgba(0, 0, 0, 0.02);
         border: 1px solid var(--glass-border);
         border-radius: 14px;
         padding: 0.6rem 0.75rem 0.6rem 1.1rem;
@@ -456,6 +470,42 @@
         transform: none;
     }
 
+    /* Mic button styles */
+    .mic-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        background: transparent;
+        border: 1px solid var(--glass-border);
+        color: var(--text-dim);
+        cursor: pointer;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+
+    .mic-btn:hover {
+        background: rgba(0, 0, 0, 0.05);
+        color: var(--text-main);
+    }
+
+    .mic-btn.active {
+        background: #ef4444;
+        color: white;
+        border-color: #ef4444;
+        box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+        animation: pulse-red 1.5s infinite;
+    }
+
+    @keyframes pulse-red {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.12); }
+        100% { transform: scale(1); }
+    }
+
     .input-hint {
         font-size: 0.7rem;
         color: var(--text-dim);
@@ -468,7 +518,7 @@
         display: flex;
         flex-direction: column;
         border-left: 1px solid var(--glass-border);
-        background: rgba(15, 13, 27, 0.95);
+        background: rgba(255, 255, 255, 0.95);
         overflow: hidden;
     }
 
@@ -621,7 +671,7 @@
         width: 100%;
         padding: 0.48rem 0.65rem;
         border-radius: 7px;
-        background: var(--bg-dark);
+        background: rgba(255, 255, 255, 0.5);
         border: 1px solid var(--glass-border);
         color: inherit;
         font-size: 0.75rem;
@@ -823,6 +873,9 @@
                     <div class="input-wrap">
                         <textarea id="chatInput" name="query" placeholder="Message BizBot…" rows="1" autocomplete="off"
                             onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+                        <button type="button" class="mic-btn" id="micBtn" onclick="toggleMic()" title="Voice Input">
+                             <i class="fas fa-microphone"></i>
+                        </button>
                         <button class="send-btn" type="submit" id="sendBtn">
                             <i class="fas fa-paper-plane"></i>
                         </button>
@@ -890,6 +943,60 @@
         el.style.height = Math.min(el.scrollHeight, 140) + 'px';
     }
 
+    /* ── Voice Recognition ───────────────────── */
+    let recognition;
+    let isListening = false;
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = () => {
+            isListening = true;
+            document.getElementById('micBtn').classList.add('active');
+            document.getElementById('chatInput').placeholder = "Listening...";
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            const input = document.getElementById('chatInput');
+            input.value = (input.value + " " + transcript).trim();
+            autoResize(input);
+        };
+
+        recognition.onerror = (event) => {
+            console.error("Speech Recognition Error:", event.error);
+            stopMic();
+        };
+
+        recognition.onend = () => {
+            stopMic();
+        };
+    }
+
+    function toggleMic() {
+        if (!recognition) {
+            alert("Speech recognition is not supported in this browser.");
+            return;
+        }
+        if (isListening) {
+            recognition.stop();
+        } else {
+            recognition.start();
+        }
+    }
+
+    function stopMic() {
+        isListening = false;
+        const btn = document.getElementById('micBtn');
+        if(btn) btn.classList.remove('active');
+        const input = document.getElementById('chatInput');
+        if(input) input.placeholder = "Message BizBot...";
+    }
+
     /* ── Submit with Enter (Shift+Enter = newline) */
     function handleKey(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -948,15 +1055,8 @@
     }
 
     /* ── CRM contact selection ─────────────── */
-    const CONTACTS = [
-        {% for c in crm_contacts %}
-    {
-        pk: '{{ c.pk }}',
-            name: '{{ c.first_name|escapejs }} {{ c.last_name|escapejs }}',
-                email: '{{ c.email|escapejs }}'
-    } {% if not forloop.last %}, {% endif %}
-    {% endfor %}
-    ];
+    // Safely embed Django iteration into a separate data block to avoid JS syntax errors in the IDE
+    const CONTACTS = JSON.parse(document.getElementById('crm-contacts-data').textContent);
     let selected = new Set();
 
     function toggleC(pk) {

@@ -6,6 +6,14 @@
 
 {% block extra_css %}
 <style>
+    :root {
+        --primary: #590df2;
+        --glass-bg: #ffffff;
+        --glass-border: rgba(0, 0, 0, 0.1);
+        --text-main: #1a1a1a;
+        --text-dim: #64748b;
+    }
+
     .settings-container {
         display: grid;
         grid-template-columns: 280px 1fr;
@@ -22,7 +30,7 @@
     .settings-nav-item {
         padding: 1rem;
         border-radius: 12px;
-        background: rgba(255, 255, 255, 0.03);
+        background: rgba(0, 0, 0, 0.03);
         border: 1px solid var(--glass-border);
         color: var(--text-dim);
         cursor: pointer;
@@ -34,29 +42,31 @@
     }
 
     .settings-nav-item:hover {
-        background: rgba(255, 255, 255, 0.06);
+        background: rgba(0, 0, 0, 0.05);
         color: var(--text-main);
         transform: translateX(5px);
     }
 
     .settings-nav-item.active {
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+        background: rgba(89, 13, 242, 0.1);
         border-color: var(--primary);
         color: var(--primary);
     }
 
     .settings-content {
-        background: var(--glass-bg);
+        background: #ffffff !important;
         border: 1px solid var(--glass-border);
         border-radius: 20px;
         padding: 2.5rem;
+        color: #1a1a1a;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
     }
 
     .settings-section-title {
         font-size: 1.5rem;
         font-weight: 700;
         margin-bottom: 2rem;
-        color: var(--text-main);
+        color: #1a1a1a;
         display: flex;
         align-items: center;
         gap: 0.75rem;
@@ -79,13 +89,14 @@
     .input-field {
         width: 100%;
         padding: 0.75rem 1rem;
-        background: rgba(15, 13, 27, 0.6);
-        border: 1px solid var(--glass-border);
+        background: #f8fafc !important;
+        border: 1px solid #e2e8f0;
         border-radius: 10px;
-        color: var(--text-main);
+        color: #1a1a1a !important;
         outline: none;
         transition: all 0.3s ease;
         margin-bottom: 1rem;
+        font-family: inherit;
     }
 
     .input-field:focus {
@@ -225,9 +236,10 @@
         <div class="settings-section">
             <h2 class="settings-section-title"><i class="fas fa-user-edit"></i> Account Management</h2>
             
-            <form method="POST">
+            <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="update_profile">
+                
                 <div class="settings-group">
                     <span class="settings-group-label">Personal Information</span>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
@@ -240,9 +252,103 @@
                             <input type="text" name="last_name" class="input-field" value="{{ user.last_name }}">
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">Update Profile</button>
                 </div>
+
+                <div class="settings-group">
+                    <span class="settings-group-label">Shop Information</span>
+                    
+                    <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 15px; border: 1px solid var(--glass-border);">
+                        <div style="position: relative; width: 100px; height: 100px;">
+                            {% if profile.shop_profile %}
+                                <img src="{{ profile.shop_profile.url }}" id="profile_preview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 15px; border: 2px solid var(--primary);">
+                            {% else %}
+                                <div id="profile_placeholder" style="width: 100%; height: 100%; background: var(--glass-bg); border-radius: 15px; display: flex; align-items: center; justify-content: center; border: 2px dashed var(--glass-border);">
+                                    <i class="fas fa-store" style="font-size: 2rem; color: var(--text-dim);"></i>
+                                </div>
+                            {% endif %}
+                            <label for="shop_profile_input" style="position: absolute; bottom: -10px; right: -10px; width: 35px; height: 35px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                            <input type="file" name="shop_profile" id="shop_profile_input" style="display: none;" onchange="previewImage(this)">
+                        </div>
+                        <div style="flex: 1;">
+                            <h4 style="margin: 0; color: var(--text-main);">Shop Profile Picture</h4>
+                            <p style="margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--text-dim);">Update your business brand image.</p>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div>
+                            <label style="font-size: 0.75rem; color: var(--text-dim);">Shop Name</label>
+                            <input type="text" name="shop_name" class="input-field" value="{{ profile.shop_name|default:'' }}">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.75rem; color: var(--text-dim);">Contact Number</label>
+                            <input type="text" name="contact" class="input-field" value="{{ profile.contact|default:'' }}">
+                        </div>
+                    </div>
+
+                    <label style="font-size: 0.75rem; color: var(--text-dim);">Business Address</label>
+                    <textarea name="address" class="input-field" rows="3" style="resize: vertical;">{{ profile.address|default:'' }}</textarea>
+
+                    <div style="margin-top: 1rem;">
+                        <label style="font-size: 0.75rem; color: var(--text-dim);">Shop Location (Coordinates)</label>
+                        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                            <input type="text" name="latitude" id="lat_input" class="input-field" value="{{ profile.latitude|default:'' }}" placeholder="Latitude" style="margin-bottom: 0;">
+                            <input type="text" name="longitude" id="lng_input" class="input-field" value="{{ profile.longitude|default:'' }}" placeholder="Longitude" style="margin-bottom: 0;">
+                            <button type="button" onclick="detectLocation()" class="btn" style="background: rgba(99, 102, 241, 0.1); border: 1px solid var(--primary); color: var(--primary); white-space: nowrap;">
+                                <i class="fas fa-location-arrow"></i> Detect
+                            </button>
+                        </div>
+                        {% if profile.latitude and profile.longitude %}
+                        <div id="settings_map_preview" style="width: 100%; height: 200px; border-radius: 12px; overflow: hidden; border: 1px solid var(--glass-border);">
+                            <iframe width="100%" height="100%" frameborder="0" scrolling="no" src="https://maps.google.com/maps?q={{ profile.latitude }},{{ profile.longitude }}&hl=es&z=14&amp;output=embed"></iframe>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="padding: 1rem 2rem; width: 100%;">Save Changes</button>
             </form>
+            
+            <script>
+                function previewImage(input) {
+                    if (input.files && input.files[0]) {
+                        var reader = new FileReader();
+                        reader.onload = function(e) {
+                            let preview = document.getElementById('profile_preview');
+                            if (!preview) {
+                                document.getElementById('profile_placeholder').outerHTML = `<img id="profile_preview" style="width: 100%; height: 100%; object-fit: cover; border-radius: 15px; border: 2px solid var(--primary);">`;
+                                preview = document.getElementById('profile_preview');
+                            }
+                            preview.src = e.target.result;
+                        }
+                        reader.readAsDataURL(input.files[0]);
+                    }
+                }
+
+                function detectLocation() {
+                    const btn = event.currentTarget;
+                    const oldHtml = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition((pos) => {
+                            document.getElementById('lat_input').value = pos.coords.latitude;
+                            document.getElementById('lng_input').value = pos.coords.longitude;
+                            btn.innerHTML = '<i class="fas fa-check"></i>';
+                            btn.style.color = '#22c55e';
+                            btn.style.borderColor = '#22c55e';
+                        }, (err) => {
+                            alert("Geolocation error: " + err.message);
+                            btn.innerHTML = oldHtml;
+                        });
+                    } else {
+                        alert("Geolocation not supported");
+                        btn.innerHTML = oldHtml;
+                    }
+                }
+            </script>
 
             <form method="POST">
                 {% csrf_token %}
