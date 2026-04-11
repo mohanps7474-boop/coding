@@ -186,56 +186,63 @@
     });
 
     document.getElementById('applyAiBtn').addEventListener('click', function() {
-        if(!currentAiData) return;
-        
-        // Multi-stage selector for maximum robustness
-        const find = (name) => document.getElementById('id_' + name) || document.querySelector(`[name="${name}"]`);
-        
-        const fName    = find('name');
-        const fChannel = find('channel');
-        const fContent = find('content');
-        const fTime    = find('schedule_time');
+        if (!currentAiData) return;
 
-        if(fName)    fName.value    = currentAiData.name    || '';
-        if(fContent) fContent.value = currentAiData.content || '';
-        
-        if(fChannel) {
-            const val = (currentAiData.channel || 'EMAIL').toUpperCase();
-            // Try to find matching option value
-            for(let opt of fChannel.options) {
-                if(opt.value.toUpperCase() === val) {
+        // ── Map data to form fields by their Django-generated IDs ──
+        const fName     = document.getElementById('id_name');
+        const fChannel  = document.getElementById('id_channel');
+        const fContent  = document.getElementById('id_content');
+        const fTime     = document.getElementById('id_schedule_time');
+
+        if (fName && currentAiData.name) {
+            fName.value = currentAiData.name;
+        }
+
+        if (fContent && currentAiData.content) {
+            fContent.value = currentAiData.content;
+        }
+
+        if (fChannel && currentAiData.channel) {
+            const val = currentAiData.channel.toUpperCase();
+            for (let opt of fChannel.options) {
+                if (opt.value.toUpperCase() === val) {
                     fChannel.value = opt.value;
                     break;
                 }
             }
         }
-        
-        if(fTime && currentAiData.schedule) {
-            // ISO format fixer (replace space with T)
-            fTime.value = currentAiData.schedule.replace(' ', 'T').substring(0, 16);
+
+        if (fTime && currentAiData.schedule) {
+            // datetime-local input requires exactly "YYYY-MM-DDTHH:MM"
+            let sched = currentAiData.schedule.trim().replace(' ', 'T');
+            // Trim to 16 chars (YYYY-MM-DDTHH:MM)
+            if (sched.length > 16) sched = sched.substring(0, 16);
+            fTime.value = sched;
         }
 
-        // --- Premium Visual Feedback: Glow for all found fields ---
+        // ── Visual feedback: green glow on all filled fields ──
         [fName, fChannel, fContent, fTime].forEach(f => {
-            if(f) {
-                f.style.borderColor = '#10b981';
-                f.style.boxShadow   = '0 0 15px rgba(16, 185, 129, 0.4)';
-                f.style.background  = 'rgba(16, 185, 129, 0.05)';
-                f.focus(); // Scroll to/highlight the area
+            if (f && f.value) {
+                f.style.borderColor  = '#10b981';
+                f.style.boxShadow    = '0 0 15px rgba(16, 185, 129, 0.4)';
+                f.style.background   = 'rgba(16, 185, 129, 0.05)';
                 setTimeout(() => {
                     f.style.borderColor = '';
                     f.style.boxShadow   = '';
                     f.style.background  = '';
-                }, 1500);
+                }, 2000);
             }
         });
-        
-        this.innerHTML = '<i class="fas fa-check"></i> Form Populated Successfully';
+
+        // Scroll to the form top so user can review
+        document.getElementById('campaignForm')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        this.innerHTML = '<i class="fas fa-check"></i> Form Filled!';
         this.style.background = '#059669';
         setTimeout(() => {
             this.innerHTML = 'Apply to Form';
             this.style.background = 'var(--accent)';
-        }, 3000);
+        }, 2500);
     });
 </script>
 {% endblock %}

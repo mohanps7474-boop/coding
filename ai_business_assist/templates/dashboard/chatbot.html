@@ -4,7 +4,10 @@
 {% block title %}BizBot Chat{% endblock %}
 {% block page_title %}AI Chatbot{% endblock %}
 
-{% block extra_js %}
+
+
+{% block content %}
+<!-- CRM contacts data — must be before the inline <script> below -->
 <script type="application/json" id="crm-contacts-data">
 [
     {% for c in crm_contacts %}
@@ -16,9 +19,6 @@
     {% endfor %}
 ]
 </script>
-{% endblock %}
-
-{% block content %}
 <style>
     /* ── full-height reset ─────────────────────── */
     .fade-in {
@@ -591,6 +591,23 @@
         background: rgba(99, 102, 241, 0.14);
     }
 
+    /* Native checkbox styled */
+    .crm-chk {
+        width: 16px;
+        height: 16px;
+        accent-color: #6366f1;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    /* Select-all checkbox */
+    .sel-all-chk {
+        width: 16px;
+        height: 16px;
+        accent-color: #6366f1;
+        cursor: pointer;
+    }
+
     .c-avatar {
         width: 28px;
         height: 28px;
@@ -625,28 +642,6 @@
         text-overflow: ellipsis;
     }
 
-    .c-chk {
-        width: 14px;
-        height: 14px;
-        border: 2px solid var(--glass-border);
-        border-radius: 3px;
-        flex-shrink: 0;
-        transition: background 0.15s, border-color 0.15s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .c-chk.on {
-        background: #6366f1;
-        border-color: #6366f1;
-    }
-
-    .c-chk.on::after {
-        content: '✓';
-        color: white;
-        font-size: 8px;
-    }
 
     /* Bulk email form */
     .bulk-form {
@@ -891,20 +886,22 @@
                 <h4><i class="fas fa-address-book"></i> CRM Contacts</h4>
                 <span class="badge-count">{{ crm_contacts|length }}</span>
             </div>
-            <div class="sel-all-row" onclick="toggleSelectAll()">
-                <div class="c-chk" id="selAllChk"></div>
-                <span>Select All</span>
+            <div class="sel-all-row" id="selAllRow" style="cursor:pointer;">
+                <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;width:100%;">
+                    <input type="checkbox" id="selAllChk" class="sel-all-chk">
+                    <span>Select All</span>
+                </label>
             </div>
             <div class="crm-scroll">
                 {% for c in crm_contacts %}
-                <div class="crm-contact" id="ci-{{ c.pk }}" onclick="toggleC('{{ c.pk }}')">
+                <label class="crm-contact" id="ci-{{ c.pk }}" data-pk="{{ c.pk }}" style="cursor:pointer;">
+                    <input type="checkbox" class="crm-chk" id="ck-{{ c.pk }}" data-pk="{{ c.pk }}" style="cursor:pointer;">
                     <div class="c-avatar">{{ c.first_name|first|upper }}{{ c.last_name|first|upper }}</div>
                     <div class="c-info">
                         <div class="c-name">{{ c.first_name }} {{ c.last_name }}</div>
                         <div class="c-email">{{ c.email }}</div>
                     </div>
-                    <div class="c-chk" id="ck-{{ c.pk }}"></div>
-                </div>
+                </label>
                 {% empty %}
                 <div style="padding:1.5rem;text-align:center;color:var(--text-dim);font-size:0.8rem;">
                     <i class="fas fa-users"
@@ -1054,64 +1051,53 @@
         }
     }
 
-    /* ── CRM contact selection ─────────────── */
-    // Safely embed Django iteration into a separate data block to avoid JS syntax errors in the IDE
+    /* ── CRM contact selection — native checkboxes ─── */
     const CONTACTS = JSON.parse(document.getElementById('crm-contacts-data').textContent);
+    CONTACTS.forEach(c => c.pk = String(c.pk));
     let selected = new Set();
-
-    function toggleC(pk) {
-        if (selected.has(pk)) {
-            selected.delete(pk);
-            document.getElementById('ci-' + pk)?.classList.remove('sel');
-            document.getElementById('ck-' + pk)?.classList.remove('on');
-        } else {
-            selected.add(pk);
-            document.getElementById('ci-' + pk)?.classList.add('sel');
-            document.getElementById('ck-' + pk)?.classList.add('on');
-        }
-        syncUI();
-    }
-
-    function toggleSelectAll() {
-        if (selected.size === CONTACTS.length) {
-            CONTACTS.forEach(c => {
-                selected.delete(c.pk);
-                document.getElementById('ci-' + c.pk)?.classList.remove('sel');
-                document.getElementById('ck-' + c.pk)?.classList.remove('on');
-            });
-        } else {
-            CONTACTS.forEach(c => {
-                selected.add(c.pk);
-                document.getElementById('ci-' + c.pk)?.classList.add('sel');
-                document.getElementById('ck-' + c.pk)?.classList.add('on');
-            });
-        }
-        syncUI();
-    }
 
     function syncUI() {
         const elCount = document.getElementById('selCount');
         if (elCount) elCount.textContent = selected.size;
-
         const btn = document.getElementById('bulkBtn');
         if (btn) btn.disabled = selected.size === 0;
-
-        const ac = document.getElementById('selAllChk');
-        if (ac) {
-            if (selected.size === 0) {
-                ac.classList.remove('on');
-                ac.style.background = '';
-                ac.style.borderColor = '';
-            } else if (selected.size === CONTACTS.length) {
-                ac.classList.add('on');
-                ac.style.background = '';
-                ac.style.borderColor = '';
-            } else {
-                ac.classList.remove('on');
-                ac.style.background = 'rgba(99,102,241,0.35)';
-                ac.style.borderColor = '#6366f1';
-            }
+        const selAll = document.getElementById('selAllChk');
+        if (selAll) {
+            selAll.indeterminate = selected.size > 0 && selected.size < CONTACTS.length;
+            selAll.checked = selected.size === CONTACTS.length;
         }
+        // Update row highlight
+        CONTACTS.forEach(c => {
+            const row = document.getElementById('ci-' + c.pk);
+            if (row) {
+                if (selected.has(c.pk)) row.classList.add('sel');
+                else row.classList.remove('sel');
+            }
+        });
+    }
+
+    /* Wire up individual checkboxes */
+    document.querySelectorAll('.crm-chk').forEach(function(chk) {
+        chk.addEventListener('change', function() {
+            const pk = String(this.getAttribute('data-pk'));
+            if (this.checked) selected.add(pk);
+            else selected.delete(pk);
+            syncUI();
+        });
+    });
+
+    /* Wire up select-all */
+    var selAllChk = document.getElementById('selAllChk');
+    if (selAllChk) {
+        selAllChk.addEventListener('change', function() {
+            document.querySelectorAll('.crm-chk').forEach(function(chk) {
+                chk.checked = selAllChk.checked;
+                const pk = String(chk.getAttribute('data-pk'));
+                if (selAllChk.checked) selected.add(pk);
+                else selected.delete(pk);
+            });
+            syncUI();
+        });
     }
 
     /* ── Bulk email ────────────────────────── */

@@ -6,7 +6,7 @@
 
 {% block content %}
 <style>
-    /* Edit button */
+    /* Existing btn-edit & btn-danger styles preserved or updated */
     .btn-edit {
         background: rgba(99, 102, 241, 0.15);
         color: #818cf8;
@@ -28,7 +28,6 @@
         transform: scale(1.04);
     }
 
-    /* Delete button */
     .btn-danger {
         background: rgba(239, 68, 68, 0.15);
         color: #f87171;
@@ -62,7 +61,7 @@
         inset: 0;
         background: rgba(0, 0, 0, 0.6);
         backdrop-filter: blur(4px);
-        z-index: 1000;
+        z-index: 2000;
         align-items: center;
         justify-content: center;
     }
@@ -70,13 +69,13 @@
         display: flex;
     }
     .modal-box {
-        background: var(--card-bg, #1e1b2e);
+        background: #fff;
         border: 1px solid rgba(239, 68, 68, 0.3);
         border-radius: 1rem;
         padding: 2rem;
         max-width: 400px;
         width: 90%;
-        box-shadow: 0 0 40px rgba(239, 68, 68, 0.2);
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
         text-align: center;
         animation: popIn 0.2s ease;
     }
@@ -93,10 +92,11 @@
         font-size: 1.2rem;
         font-weight: 700;
         margin-bottom: 0.5rem;
+        color: #1e293b;
     }
     .modal-subtitle {
         font-size: 0.9rem;
-        color: var(--text-dim, #94a3b8);
+        color: #64748b;
         margin-bottom: 1.5rem;
     }
     .modal-actions {
@@ -105,16 +105,16 @@
         justify-content: center;
     }
     .modal-cancel {
-        background: rgba(255,255,255,0.07);
-        border: 1px solid rgba(255,255,255,0.12);
-        color: inherit;
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        color: #475569;
         padding: 0.55rem 1.25rem;
         border-radius: 0.5rem;
         font-weight: 600;
         cursor: pointer;
         transition: background 0.2s;
     }
-    .modal-cancel:hover { background: rgba(255,255,255,0.13); }
+    .modal-cancel:hover { background: #e2e8f0; }
     .modal-confirm {
         background: #ef4444;
         color: #fff;
@@ -133,13 +133,16 @@
 
 <div class="fade-in">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <p style="color: var(--text-dim);">Manage your customers and leads here.</p>
+        <div>
+            <h2 style="margin-bottom: 0.25rem;">Contacts</h2>
+            <p style="color: var(--text-dim); font-size: 0.9rem;">Manage your customers and leads here.</p>
+        </div>
         <a href="{% url 'contact_create' %}" class="btn btn-primary">
             <i class="fas fa-user-plus"></i> Add Contact
         </a>
     </div>
 
-    <div class="glass-card">
+    <div class="glass-card" style="padding: 0; overflow: hidden;">
         <table>
             <thead>
                 <tr>
@@ -151,10 +154,10 @@
                     <th>ACTIONS</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="contactTableBody">
                 {% for contact in contacts %}
-                <tr>
-                    <td>{{ contact }}</td>
+                <tr data-id="{{ contact.pk }}">
+                    <td style="font-weight: 600;">{{ contact }}</td>
                     <td style="color: var(--text-dim);">{{ contact.email }}</td>
                     <td style="color: var(--text-dim);">{{ contact.phone_number }}</td>
                     <td>
@@ -170,16 +173,20 @@
                             </a>
                             <button class="btn-danger" data-pk="{{ contact.pk }}" data-name="{{ contact|escapejs }}"
                                 onclick="openDeleteModal(this.dataset.pk, this.dataset.name)">
-                                <i class="fas fa-trash-alt"></i> Delete
+                                <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" style="padding: 3rem; text-align: center; color: var(--text-dim);">
-                        <i class="fas fa-users fa-3x" style="margin-bottom: 1rem; opacity: 0.3;"></i>
-                        <p>No contacts found. Start by adding one!</p>
+                    <td colspan="6" style="padding: 4rem 2rem; text-align: center; color: var(--text-dim);">
+                        <i class="fas fa-users fa-3x" style="margin-bottom: 1.5rem; opacity: 0.2;"></i>
+                        <p style="font-size: 1.1rem; font-weight: 500;">No contacts found.</p>
+                        <p style="font-size: 0.9rem;">Start by adding your first customer to the CRM.</p>
+                        <a href="{% url 'contact_create' %}" class="btn btn-primary" style="margin-top: 1.5rem;">
+                            <i class="fas fa-plus"></i> Add Contact
+                        </a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -187,6 +194,7 @@
         </table>
     </div>
 </div>
+
 
 <!-- Delete Confirmation Modal -->
 <div class="modal-overlay" id="deleteModal">
@@ -213,11 +221,14 @@
             'Are you sure you want to delete "' + name + '"? This cannot be undone.';
         document.getElementById('deleteModal').classList.add('active');
     }
+
     function closeDeleteModal() {
         document.getElementById('deleteModal').classList.remove('active');
     }
+
     document.getElementById('deleteModal').addEventListener('click', function(e) {
         if (e.target === this) closeDeleteModal();
     });
 </script>
+
 {% endblock %}

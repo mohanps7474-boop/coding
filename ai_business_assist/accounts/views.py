@@ -11,7 +11,7 @@ from .models import Profile
 # Create your views here.
 def handle_login(request):
     if request.user.is_authenticated:
-        return redirect("dashboard")
+        return redirect("contact_list")
     if request.method == "GET":
         success_msg = None
         if request.session.pop('registration_success', False):
@@ -26,14 +26,14 @@ def handle_login(request):
             is_new_user = request.session.pop('is_new_user', False)
             if is_new_user:
                 return redirect("form_page")
-            return redirect("dashboard")
+            return redirect("contact_list")
         else:
             return render(request,"accounts/login.html",{"error":"Invalid email or password"})
         
         
 def register(request):
     if request.user.is_authenticated:
-        return redirect("dashboard")
+        return redirect("contact_list")
     if request.method == "GET":
         return render(request,"accounts/register.html")
     if request.method == "POST":

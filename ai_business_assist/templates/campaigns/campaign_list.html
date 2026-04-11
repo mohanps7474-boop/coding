@@ -13,19 +13,27 @@
         font-weight: 500;
     }
     .status-completed { color: var(--accent); }
-    .status-running { color: var(--primary-light); }
-    .status-draft { color: var(--text-dim); }
+    .status-running   { color: var(--primary-light); }
+    .status-draft     { color: var(--text-dim); }
+    .status-scheduled { color: #f59e0b; }
+    #scheduler-status {
+        font-size: 0.72rem;
+        color: var(--text-dim);
+        text-align: right;
+        margin-bottom: 0.5rem;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="fade-in">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
         <p style="color: var(--text-dim);">Track and manage your automated marketing efforts.</p>
         <a href="{% url 'campaign_create' %}" class="btn btn-primary">
             <i class="fas fa-plus-circle"></i> Create Campaign
         </a>
     </div>
+    <div id="scheduler-status"><i class="fas fa-clock"></i> Scheduler active — checks every 30s</div>
 
     {% if messages %}
         <div style="margin-bottom: 2rem;">
@@ -64,8 +72,18 @@
                 {% if campaign.status == 'DRAFT' %}
                     <a href="{% url 'campaign_launch' campaign.pk %}" class="btn btn-primary" 
                        style="width: 100%; justify-content: center; background: linear-gradient(135deg, #10b981, #34d399); border: none; font-weight: 700;"
-                       onclick="this.innerHTML='<i class=\'fas fa-spinner fa-spin\'></i> AI Personalizing & Sending...'; this.style.opacity='0.6'; this.style.pointerEvents='none';">
+                       onclick="this.innerHTML='<i class=\'fas fa-spinner fa-spin\'></i> AI Personalizing &amp; Sending...'; this.style.opacity='0.6'; this.style.pointerEvents='none';">
                         <i class="fas fa-rocket"></i> Launch to All Contacts
+                    </a>
+                {% elif campaign.status == 'SCHEDULED' %}
+                    <div style="text-align:center; font-size:0.8rem; color:#f59e0b; padding:0.5rem; background:rgba(245,158,11,0.07); border-radius:8px; margin-bottom:0.5rem;">
+                        <i class="fas fa-clock"></i>
+                        Scheduled: {{ campaign.schedule_time|date:"M d, Y · H:i" }}
+                    </div>
+                    <a href="{% url 'campaign_launch' campaign.pk %}" class="btn"
+                       style="width:100%; justify-content:center; background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.3); color:#f59e0b; font-weight:600;"
+                       onclick="this.innerHTML='<i class=\'fas fa-spinner fa-spin\'></i> Sending...'; this.style.opacity='0.6'; this.style.pointerEvents='none';">
+                        <i class="fas fa-paper-plane"></i> Launch Now
                     </a>
                 {% elif campaign.status == 'COMPLETED' %}
                     <div style="text-align: center; font-size: 0.8rem; color: var(--accent); padding: 0.5rem; background: rgba(16,185,129,0.05); border-radius: 8px;">
@@ -73,6 +91,7 @@
                     </div>
                 {% endif %}
             </div>
+
 
             <div
                 style="display: flex; justify-content: space-between; align-items: center; padding-top: 1.25rem; border-top: 1px solid var(--glass-border);">
@@ -103,4 +122,32 @@
         {% endfor %}
     </div>
 </div>
+
+<script>
+(function() {
+    var CHECK_URL = "{% url 'check_scheduled_campaigns' %}";
+    var statusEl  = document.getElementById('scheduler-status');
+
+    function checkScheduled() {
+        fetch(CHECK_URL, {credentials: 'same-origin'})
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.triggered && data.triggered.length > 0) {
+                    // A scheduled campaign just fired — reload to show updated status
+                    var names = data.triggered.map(function(c){ return c.name; }).join(', ');
+                    statusEl.innerHTML = '<i class="fas fa-check-circle" style="color:#10b981"></i> Auto-launched: ' + names + ' — refreshing…';
+                    setTimeout(function(){ location.reload(); }, 1500);
+                } else {
+                    var t = new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+                    statusEl.innerHTML = '<i class="fas fa-clock"></i> Scheduler active — last checked ' + t;
+                }
+            })
+            .catch(function() { /* silently ignore network errors */ });
+    }
+
+    // Check immediately on page load, then every 30 seconds
+    checkScheduled();
+    setInterval(checkScheduled, 30000);
+})();
+</script>
 {% endblock %}

@@ -8,4 +8,5 @@ urlpatterns = [
     path('edit/<int:pk>/', views.campaign_edit, name='campaign_edit'),
     path('delete/<int:pk>/', views.campaign_delete, name='campaign_delete'),
     path('ai-suggest/', views.campaign_ai_suggest, name='campaign_ai_suggest'),
+    path('check-scheduled/', views.check_scheduled_campaigns, name='check_scheduled_campaigns'),
 ]

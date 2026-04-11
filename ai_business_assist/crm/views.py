@@ -5,7 +5,7 @@ from .forms import ContactForm
 
 @login_required
 def contact_list(request):
-    contacts = Contact.objects.all()
+    contacts = Contact.objects.all().order_by('-created_at')
     return render(request, 'crm/contact_list.html', {'contacts': contacts})
 
 @login_required
