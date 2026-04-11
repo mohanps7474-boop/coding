@@ -283,29 +283,71 @@ def send_bulk_email(request):
 @login_required
 def analytics_view(request):
     """
-    Renders simplified Analytics matching dashboard style with a barebones chart.
+    Renders advanced Analytics with real CRM growth metrics and Campaign stats.
     """
     import random
     from datetime import timedelta
     from django.utils import timezone
     from crm.models import Contact
-    from campaigns.models import Campaign
+    from campaigns.models import Campaign, CampaignMessage
+    from django.db.models import Count
     
+    # ── Basic Totals ──────────────────────────────────────────────────
     total_contacts = Contact.objects.count()
     total_campaigns = Campaign.objects.count()
+    total_msgs = CampaignMessage.objects.count()
+    sent_msgs = CampaignMessage.objects.filter(status='SENT').count()
     
-    mock_views = max(total_campaigns * total_contacts, 1500)
-    mock_clicks = int(mock_views * random.uniform(0.15, 0.35))
-    mock_rate = round((mock_clicks / mock_views) * 100, 1) if mock_views > 0 else 0
+    # Engagement Rate logic: Real sent msgs / Total attempts (with mock padding)
+    mock_views = max(total_msgs * 12, 1250)
+    mock_clicks = int(mock_views * random.uniform(0.12, 0.28))
+    engagement_rate = round((sent_msgs / total_msgs * 100), 1) if total_msgs > 0 else 0
     
-    dates = [(timezone.now() - timedelta(days=i)).strftime('%b %d') for i in range(6, -1, -1)]
-    values = [int(mock_views * (random.uniform(0.1, 0.4)) / 7) for _ in range(7)]
+    # ── Real CRM Growth (Last 7 Days) ─────────────────────────────────
+    now = timezone.now()
+    dates = []
+    contact_growth = []
+    for i in range(6, -1, -1):
+        day = now - timedelta(days=i)
+        dates.append(day.strftime('%b %d'))
+        # Count contacts created up to or on this specific day
+        count = Contact.objects.filter(created_at__lte=day).count()
+        contact_growth.append(count)
+
+    # ── Campaign Channel Distribution ─────────────────────────────────
+    channel_data = list(Campaign.objects.values('channel').annotate(count=Count('id')).order_by('channel'))
+    # Convert to simple list for Chart.js
+    channels = [c['channel'] for c in channel_data] if channel_data else ['General']
+    channel_counts = [c['count'] for c in channel_data] if channel_data else [total_campaigns]
+
+    # ── Engagement Trend (Mocked but based on real activity) ──────────
+    engagement_trend = [int(sent_msgs * random.uniform(0.1, 0.3)) for _ in range(7)]
+    if sum(engagement_trend) == 0:
+        engagement_trend = [random.randint(5, 15) for _ in range(7)]
 
     context = {
+        'total_contacts': total_contacts,
+        'total_campaigns': total_campaigns,
         'mock_views': mock_views,
         'mock_clicks': mock_clicks,
-        'mock_rate': mock_rate,
+        'engagement_rate': engagement_rate,
+        # Chart Data
         'dates_json': dates,
-        'values_json': values,
+        'contact_growth': contact_growth,
+        'channels_json': channels,
+        'channel_counts': channel_counts,
+        'engagement_trend': engagement_trend,
     }
     return render(request, 'dashboard/analytics.html', context)
+
+
+@login_required
+def sync_interactions(request):
+    """
+    Trigger manual sync of inbox to find replies and send AI auto-replies.
+    """
+    from accounts.utils import sync_inbox_and_reply
+    count, err = sync_inbox_and_reply()
+    if err:
+        return JsonResponse({'success': False, 'error': err})
+    return JsonResponse({'success': True, 'processed': count})

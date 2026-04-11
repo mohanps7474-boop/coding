@@ -49,6 +49,12 @@
                     <span>Analytics</span>
                 </a>
             </li>
+            <li class="nav-item" style="margin-top: 2rem;">
+                <button onclick="syncAIInbox()" id="syncBtn" class="nav-link" style="background: none; border: none; width: 100%; cursor: pointer; color: var(--accent);">
+                    <i class="fas fa-sync-alt" id="syncIcon"></i>
+                    <span>Sync AI Inbox</span>
+                </button>
+            </li>
         </ul>
         <div class="nav-item" style="margin-top: auto;">
             <a href="{% url 'settings' %}" class="nav-link {% if request.resolver_match.url_name == 'settings' %}active{% endif %}">
@@ -99,6 +105,34 @@
                 link.querySelector('i').style.transform = 'scale(1) rotate(0)';
             });
         });
+        function syncAIInbox() {
+            const btn = document.getElementById('syncBtn');
+            const icon = document.getElementById('syncIcon');
+            
+            icon.classList.add('fa-spin');
+            btn.style.opacity = '0.5';
+            btn.disabled = true;
+
+            fetch("{% url 'sync_interactions' %}")
+                .then(res => res.json())
+                .then(data => {
+                    icon.classList.remove('fa-spin');
+                    btn.style.opacity = '1';
+                    btn.disabled = false;
+                    
+                    if(data.success) {
+                        alert(`Successfully synced! AI sent ${data.processed} auto-replies to your customers.`);
+                    } else {
+                        alert(`Sync Error: ${data.error}`);
+                    }
+                })
+                .catch(err => {
+                    icon.classList.remove('fa-spin');
+                    btn.style.opacity = '1';
+                    btn.disabled = false;
+                    alert("Failed to connect to the server.");
+                });
+        }
     </script>
     {% block extra_js %}{% endblock %}
 </body>

@@ -141,9 +141,9 @@ def campaign_ai_suggest(request):
 
 
 def _do_launch(campaign):
-    """Internal helper: personalize & send emails for a campaign, then mark COMPLETED."""
+    """Internal helper: personalize & send messages for a campaign, then mark COMPLETED."""
     from .models import CampaignMessage
-    from accounts.utils import send_custom_email
+    from accounts.utils import send_custom_email, send_custom_sms
 
     contacts = Contact.objects.all()
     campaign.status = 'RUNNING'
@@ -159,7 +159,19 @@ def _do_launch(campaign):
         personalized_content = generate_ai_content(personalization_prompt) or campaign.content
 
         msg_log = CampaignMessage.objects.create(campaign=campaign, contact=contact, status='PENDING')
-        success, error_msg = send_custom_email(contact.email, f"Update: {campaign.name}", personalized_content)
+        
+        # ── Channel Routing ──────────────────────────────────────────────
+        success = False
+        error_msg = None
+
+        if campaign.channel == 'EMAIL':
+            success, error_msg = send_custom_email(contact.email, f"Update: {campaign.name}", personalized_content)
+        else:
+            # SMS or WHATSAPP
+            if contact.phone_number:
+                success, error_msg = send_custom_sms(contact.phone_number, personalized_content)
+            else:
+                success, error_msg = False, "Missing phone number for contact"
 
         if success:
             msg_log.status = 'SENT'

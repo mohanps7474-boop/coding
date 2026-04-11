@@ -44,6 +44,11 @@
                    style="flex: 1; min-width: 200px; background: linear-gradient(135deg, #10b981, #34d399); color: white; border: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none;">
                     <i class="fas fa-paper-plane"></i> Send AI Email
                 </a>
+                <a href="{% url 'chatbot' %}?query=Draft a short SMS for {{ contact.first_name }} to notify about our latest deals" 
+                   class="btn" 
+                   style="flex: 1; min-width: 200px; background: linear-gradient(135deg, #6366f1, #818cf8); color: white; border: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none;">
+                    <i class="fas fa-comment-dots"></i> Send AI SMS
+                </a>
                 {% else %}
                 <button type="button" onclick="sendToChatbot()" 
                    class="btn" 
@@ -53,10 +58,13 @@
                 <script>
                     function sendToChatbot() {
                         const emailInput = document.querySelector('input[type="email"]');
+                        const phoneInput = document.querySelector('input[name="phone_number"]');
                         if (emailInput && emailInput.value) {
                             window.location.href = "{% url 'chatbot' %}?query=Draft a professional email to " + encodeURIComponent(emailInput.value);
+                        } else if (phoneInput && phoneInput.value) {
+                            window.location.href = "{% url 'chatbot' %}?query=Draft a short SMS to " + encodeURIComponent(phoneInput.value);
                         } else {
-                            alert("Please enter an email address first to draft an AI email.");
+                            alert("Please enter an email or phone number first.");
                         }
                     }
                 </script>

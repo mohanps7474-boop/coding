@@ -1,86 +1,229 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Analytics | BizBot{% endblock %}
+{% block title %}Analytics Center | BizBot{% endblock %}
 
-{% block page_title %}Analytics{% endblock %}
+{% block page_title %}Marketing Hub Analytics{% endblock %}
 
 {% block content %}
 <div class="fade-in">
-    <!-- Stats Grid derived from Dashboard -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-        <div class="glass-card" style="display: flex; align-items: center; gap: 1.5rem;">
-            <div style="background: rgba(99, 102, 241, 0.1); width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: var(--primary);">
-                <i class="fas fa-eye fa-2x"></i>
-            </div>
-            <div>
-                <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 0.25rem;">Total Views</p>
-                <h3 style="font-size: 1.8rem;">{{ mock_views }}</h3>
-            </div>
-        </div>
-
-        <div class="glass-card" style="display: flex; align-items: center; gap: 1.5rem;">
-            <div style="background: rgba(236, 72, 153, 0.1); width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: var(--secondary);">
-                <i class="fas fa-mouse-pointer fa-2x"></i>
-            </div>
-            <div>
-                <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 0.25rem;">Total Clicks</p>
-                <h3 style="font-size: 1.8rem;">{{ mock_clicks }}</h3>
+    <!-- Header Stats -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        
+        <div class="glass-card stat-card" style="border-left: 4px solid var(--primary);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">Total CRM Contacts</p>
+                    <h3 style="font-size: 2.2rem; font-weight: 800;">{{ total_contacts }}</h3>
+                    <p style="color: #10b981; font-size: 0.8rem; margin-top: 0.5rem;">
+                        <i class="fas fa-caret-up"></i> Live Tracking Enabled
+                    </p>
+                </div>
+                <div class="stat-icon" style="color: var(--primary); background: rgba(99, 102, 241, 0.1);">
+                    <i class="fas fa-users"></i>
+                </div>
             </div>
         </div>
 
-        <div class="glass-card" style="display: flex; align-items: center; gap: 1.5rem;">
-            <div style="background: rgba(16, 185, 129, 0.1); width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: var(--accent);">
-                <i class="fas fa-bolt fa-2x"></i>
+        <div class="glass-card stat-card" style="border-left: 4px solid var(--secondary);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">Marketing Reach</p>
+                    <h3 style="font-size: 2.2rem; font-weight: 800;">{{ mock_views }}</h3>
+                    <p style="color: var(--secondary); font-size: 0.8rem; margin-top: 0.5rem;">
+                        <i class="fas fa-chart-line"></i> Est. Impressions
+                    </p>
+                </div>
+                <div class="stat-icon" style="color: var(--secondary); background: rgba(236, 72, 153, 0.1);">
+                    <i class="fas fa-broadcast-tower"></i>
+                </div>
             </div>
-            <div>
-                <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 0.25rem;">Engagement Rate</p>
-                <h3 style="font-size: 1.8rem;">{{ mock_rate }}%</h3>
+        </div>
+
+        <div class="glass-card stat-card" style="border-left: 4px solid var(--accent);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <p style="color: var(--text-dim); font-size: 0.85rem; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">Delivery Success</p>
+                    <h3 style="font-size: 2.2rem; font-weight: 800;">{{ engagement_rate }}%</h3>
+                    <p style="color: var(--accent); font-size: 0.8rem; margin-top: 0.5rem;">
+                        <i class="fas fa-check-circle"></i> SMTP Status: Active
+                    </p>
+                </div>
+                <div class="stat-icon" style="color: var(--accent); background: rgba(16, 185, 129, 0.1);">
+                    <i class="fas fa-paper-plane"></i>
+                </div>
             </div>
+        </div>
+
+    </div>
+
+    <!-- Middle: CRM Growth Bar Chart (REAL DATA) -->
+    <div class="glass-card" style="margin-bottom: 2rem; position: relative; overflow: hidden;">
+        <div style="padding: 1.5rem; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 1.2rem; font-weight: 700;">CRM Database Growth</h3>
+            <span class="badge" style="background: rgba(99, 102, 241, 0.2); color: var(--primary-light);">Last 7 Days</span>
+        </div>
+        <div style="padding: 1.5rem; height: 350px;">
+            <canvas id="crmGrowthChart"></canvas>
         </div>
     </div>
 
-    <!-- Main Content Area: Simple Line Chart -->
-    <div class="glass-card" style="padding: 1.5rem;">
-        <h3 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Engagement Trends</h3>
-        <div style="height: 300px; width: 100%;">
-            <canvas id="trendChart"></canvas>
+    <!-- Bottom: Details Grid -->
+    <div style="display: grid; grid-template-columns: 2fr 1.2fr; gap: 1.5rem;">
+        
+        <!-- Engagement line -->
+        <div class="glass-card">
+            <div style="padding: 1.5rem; border-bottom: 1px solid var(--glass-border);">
+                <h3 style="font-size: 1.1rem; font-weight: 700;">Engagement Activity</h3>
+            </div>
+            <div style="padding: 1.5rem; height: 280px;">
+                <canvas id="engagementChart"></canvas>
+            </div>
         </div>
+
+        <!-- Channel Mix Doughnut -->
+        <div class="glass-card">
+            <div style="padding: 1.5rem; border-bottom: 1px solid var(--glass-border);">
+                <h3 style="font-size: 1.1rem; font-weight: 700;">Campaign Channel Mix</h3>
+            </div>
+            <div style="padding: 1.5rem; height: 280px;">
+                <canvas id="channelMixChart"></canvas>
+            </div>
+        </div>
+
     </div>
 </div>
+
+<style>
+    .stat-card {
+        padding: 1.5rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    }
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+    }
+</style>
 {% endblock %}
 
 {% block extra_js %}
-{{ dates_json|json_script:"dates-data" }}
-{{ values_json|json_script:"values-data" }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const dates = JSON.parse(document.getElementById('dates-data').textContent);
-    const values = JSON.parse(document.getElementById('values-data').textContent);
 
-    const ctx = document.getElementById('trendChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
+<!-- Injecting Data -->
+{{ dates_json|json_script:"dates-data" }}
+{{ contact_growth|json_script:"growth-data" }}
+{{ engagement_trend|json_script:"engagement-data" }}
+{{ channels_json|json_script:"channels-data" }}
+{{ channel_counts|json_script:"channel-counts-data" }}
+
+<script>
+    // Data Extraction
+    const labels = JSON.parse(document.getElementById('dates-data').textContent);
+    const growthValues = JSON.parse(document.getElementById('growth-data').textContent);
+    const engagementValues = JSON.parse(document.getElementById('engagement-data').textContent);
+    const channelLabels = JSON.parse(document.getElementById('channels-data').textContent);
+    const channelCounts = JSON.parse(document.getElementById('channel-counts-data').textContent);
+
+    // Global Defaults
+    Chart.defaults.color = '#64748b';
+    Chart.defaults.font.family = "'Inter', sans-serif";
+
+    // 1. CRM Growth Bar Chart
+    const ctxGrowth = document.getElementById('crmGrowthChart').getContext('2d');
+    const growthGradient = ctxGrowth.createLinearGradient(0, 0, 0, 400);
+    growthGradient.addColorStop(0, 'rgba(99, 102, 241, 0.8)');
+    growthGradient.addColorStop(1, 'rgba(99, 102, 241, 0.05)');
+
+    new Chart(ctxGrowth, {
+        type: 'bar',
         data: {
-            labels: dates,
+            labels: labels,
             datasets: [{
-                label: 'Engagement',
-                data: values,
+                label: 'Cumulative Contacts',
+                data: growthValues,
+                backgroundColor: growthGradient,
                 borderColor: '#6366f1',
-                borderWidth: 2,
-                backgroundColor: 'transparent',
-                fill: false,
-                tension: 0.3
+                borderWidth: 1,
+                borderRadius: 8,
+                barThickness: 45
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'top' }
+                legend: { display: false }
             },
             scales: {
-                y: { beginAtZero: true }
+                y: { grid: { borderDash: [5, 5] }, beginAtZero: true },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 2. Engagement Line Chart
+    const ctxEng = document.getElementById('engagementChart').getContext('2d');
+    new Chart(ctxEng, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Recent Interactions',
+                data: engagementValues,
+                borderColor: '#ec4899',
+                backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: '#ec4899'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { display: false },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // 3. Channel Mix Doughnut
+    const ctxMix = document.getElementById('channelMixChart').getContext('2d');
+    new Chart(ctxMix, {
+        type: 'doughnut',
+        data: {
+            labels: channelLabels,
+            datasets: [{
+                data: channelCounts,
+                backgroundColor: [
+                    '#6366f1', // Email
+                    '#10b981', // SMS
+                    '#f59e0b', // WhatsApp
+                    '#ec4899'  // Other
+                ],
+                borderWidth: 0,
+                cutout: '70%'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { 
+                    position: 'bottom',
+                    labels: { usePointStyle: true, padding: 20 }
+                }
             }
         }
     });
