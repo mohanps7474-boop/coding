@@ -10,28 +10,29 @@ def get_gemini_client():
     if not api_key:
         raise ValueError("GEMINI_API_KEY is not set in Django settings.")
     
+    # Debug print to confirm which key is active in the running server
+    print(f"--- BIZBOT AI: Initializing with API key: {api_key[:6]}... (last {api_key[-4:]}) ---")
+    
     return genai.Client(api_key=api_key)
 
 def generate_ai_content(prompt, model=None):
     """
     Generates content using Gemini API with multi-model fallback.
-    Prioritizes lighter models first for better quota management.
+    Prioritizes stable models first for better reliability.
     """
     client = get_gemini_client()
     
-    # Ordered by quota efficiency: lighter models first, then heavier ones
+    # Available models in this environment: 2.0, 2.5, and 3.x
     models_to_try = [
-        "models/gemini-2.0-flash-lite",
+        "models/gemini-flash-lite-latest",
         "models/gemini-2.0-flash",
-        "models/gemini-1.5-flash-8b",
-        "models/gemini-1.5-flash",
-        "models/gemini-1.5-pro",
-        "models/gemma-3-1b-it",
-        "models/gemma-3-12b-it",
-        "models/gemma-3-27b-it",
+        "models/gemini-2.5-flash",
+        "models/gemini-2.0-flash-lite",
+        "models/gemini-3.1-flash-lite-preview",
+        "models/gemini-2.5-pro",
+        "models/gemini-3.1-pro-preview",
     ]
     
-    # If a specific model was requested, try it first
     if model:
         models_to_try.insert(0, model)
     
@@ -48,13 +49,22 @@ def generate_ai_content(prompt, model=None):
         except Exception as e:
             last_err = e
             error_str = str(e)
+            
+            # Critical check for leaked keys
+            if 'leaked' in error_str.lower() or '403' in error_str:
+                print(f"CRITICAL SECURITY ERROR: API key in .env has been LEAKED/BLOCKED by Google.")
+                print(f"Details: {error_str}")
+                return None # Stop immediately, cycling won't help a blocked key
+                
             print(f"GenAI: {m} failed: {error_str[:150]}")
-            # Only stop cycling if ALL requests are exhausted (global quota)
-            if 'RESOURCE_EXHAUSTED' in error_str and 'GenerateContent' not in error_str:
-                break
+            
+            if 'RESOURCE_EXHAUSTED' in error_str:
+                # If we hit a global quota, wait/stop
+                continue
+            
             continue
             
-    print(f"CRITICAL: All AI models failed. Last error: {last_err}")
+    print(f"CRITICAL AI FAILURE: All models exhausted. Last error: {last_err}")
     return None
 
 def generate_marketing_message(business_type, target_audience, core_benefit):

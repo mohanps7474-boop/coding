@@ -42,7 +42,7 @@ def ai_assistant(request):
         
         ai_response = generate_ai_content(prompt)
         if not ai_response:
-            error_msg = "AI service is temporarily unavailable. This may be due to API quota limits. Please try again in a few minutes."
+            error_msg = "The AI assistant is temporarily unavailable. Check your terminal for errors and try again."
     
     return render(request, 'dashboard/ai_assistant.html', {'ai_response': ai_response, 'error_msg': error_msg})
 

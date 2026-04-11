@@ -14,8 +14,8 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load environment variables from .env
-load_dotenv()
+# Load environment variables from .env — use override=True to pick up changes on reload
+load_dotenv(override=True)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -150,4 +150,7 @@ EMAIL_USE_TLS = True
 
 # Media files configuration
 MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = BASE_DIR / 'media'
+ 
+ 
+ 
